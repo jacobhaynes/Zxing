@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/!svn/ver/1795/trunk/core/src/com/google/zxing/oned/rss/expanded
+END
+BitArrayBuilder.java
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/!svn/ver/1795/trunk/core/src/com/google/zxing/oned/rss/expanded/BitArrayBuilder.java
+END
+RSSExpandedReader.java
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/!svn/ver/1795/trunk/core/src/com/google/zxing/oned/rss/expanded/RSSExpandedReader.java
+END
+ExpandedPair.java
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/!svn/ver/1350/trunk/core/src/com/google/zxing/oned/rss/expanded/ExpandedPair.java
+END

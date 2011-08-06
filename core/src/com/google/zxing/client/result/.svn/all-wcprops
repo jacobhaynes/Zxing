@@ -1,0 +1,215 @@
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/!svn/ver/1851/trunk/core/src/com/google/zxing/client/result
+END
+GeoResultParser.java
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/!svn/ver/1795/trunk/core/src/com/google/zxing/client/result/GeoResultParser.java
+END
+CalendarParsedResult.java
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/!svn/ver/1787/trunk/core/src/com/google/zxing/client/result/CalendarParsedResult.java
+END
+TelParsedResult.java
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/!svn/ver/1093/trunk/core/src/com/google/zxing/client/result/TelParsedResult.java
+END
+ParsedResultType.java
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/!svn/ver/1421/trunk/core/src/com/google/zxing/client/result/ParsedResultType.java
+END
+URIResultParser.java
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/!svn/ver/1851/trunk/core/src/com/google/zxing/client/result/URIResultParser.java
+END
+SMSParsedResult.java
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/!svn/ver/1266/trunk/core/src/com/google/zxing/client/result/SMSParsedResult.java
+END
+URLTOResultParser.java
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/!svn/ver/809/trunk/core/src/com/google/zxing/client/result/URLTOResultParser.java
+END
+EmailAddressParsedResult.java
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/!svn/ver/1093/trunk/core/src/com/google/zxing/client/result/EmailAddressParsedResult.java
+END
+ExpandedProductParsedResult.java
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/!svn/ver/1350/trunk/core/src/com/google/zxing/client/result/ExpandedProductParsedResult.java
+END
+WifiParsedResult.java
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/!svn/ver/1421/trunk/core/src/com/google/zxing/client/result/WifiParsedResult.java
+END
+VCardResultParser.java
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/!svn/ver/1795/trunk/core/src/com/google/zxing/client/result/VCardResultParser.java
+END
+GeoParsedResult.java
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/!svn/ver/1514/trunk/core/src/com/google/zxing/client/result/GeoParsedResult.java
+END
+ResultParser.java
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/!svn/ver/1813/trunk/core/src/com/google/zxing/client/result/ResultParser.java
+END
+URIParsedResult.java
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/!svn/ver/1712/trunk/core/src/com/google/zxing/client/result/URIParsedResult.java
+END
+SMSTOMMSTOResultParser.java
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/!svn/ver/1266/trunk/core/src/com/google/zxing/client/result/SMSTOMMSTOResultParser.java
+END
+ISBNResultParser.java
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/!svn/ver/576/trunk/core/src/com/google/zxing/client/result/ISBNResultParser.java
+END
+ParsedResult.java
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/!svn/ver/796/trunk/core/src/com/google/zxing/client/result/ParsedResult.java
+END
+AddressBookAUResultParser.java
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/!svn/ver/1148/trunk/core/src/com/google/zxing/client/result/AddressBookAUResultParser.java
+END
+ProductResultParser.java
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/!svn/ver/1053/trunk/core/src/com/google/zxing/client/result/ProductResultParser.java
+END
+AddressBookParsedResult.java
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/!svn/ver/1150/trunk/core/src/com/google/zxing/client/result/AddressBookParsedResult.java
+END
+BookmarkDoCoMoResultParser.java
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/!svn/ver/706/trunk/core/src/com/google/zxing/client/result/BookmarkDoCoMoResultParser.java
+END
+ISBNParsedResult.java
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/!svn/ver/576/trunk/core/src/com/google/zxing/client/result/ISBNParsedResult.java
+END
+VEventResultParser.java
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/!svn/ver/1795/trunk/core/src/com/google/zxing/client/result/VEventResultParser.java
+END
+BizcardResultParser.java
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/!svn/ver/1148/trunk/core/src/com/google/zxing/client/result/BizcardResultParser.java
+END
+ProductParsedResult.java
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/!svn/ver/668/trunk/core/src/com/google/zxing/client/result/ProductParsedResult.java
+END
+TextParsedResult.java
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/!svn/ver/706/trunk/core/src/com/google/zxing/client/result/TextParsedResult.java
+END
+AbstractDoCoMoResultParser.java
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/!svn/ver/706/trunk/core/src/com/google/zxing/client/result/AbstractDoCoMoResultParser.java
+END
+TelResultParser.java
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/!svn/ver/870/trunk/core/src/com/google/zxing/client/result/TelResultParser.java
+END
+SMSMMSResultParser.java
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/!svn/ver/1266/trunk/core/src/com/google/zxing/client/result/SMSMMSResultParser.java
+END
+EmailAddressResultParser.java
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/!svn/ver/779/trunk/core/src/com/google/zxing/client/result/EmailAddressResultParser.java
+END
+ExpandedProductResultParser.java
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/!svn/ver/1795/trunk/core/src/com/google/zxing/client/result/ExpandedProductResultParser.java
+END
+SMTPResultParser.java
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/!svn/ver/1609/trunk/core/src/com/google/zxing/client/result/SMTPResultParser.java
+END
+AddressBookDoCoMoResultParser.java
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/!svn/ver/1148/trunk/core/src/com/google/zxing/client/result/AddressBookDoCoMoResultParser.java
+END
+WifiResultParser.java
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/!svn/ver/1421/trunk/core/src/com/google/zxing/client/result/WifiResultParser.java
+END
+EmailDoCoMoResultParser.java
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/!svn/ver/872/trunk/core/src/com/google/zxing/client/result/EmailDoCoMoResultParser.java
+END

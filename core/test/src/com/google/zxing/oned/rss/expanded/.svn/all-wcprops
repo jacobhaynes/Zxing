@@ -1,0 +1,71 @@
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/!svn/ver/1795/trunk/core/test/src/com/google/zxing/oned/rss/expanded
+END
+RSSExpandedBlackBox3TestCase.java
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/svn/!svn/ver/1350/trunk/core/test/src/com/google/zxing/oned/rss/expanded/RSSExpandedBlackBox3TestCase.java
+END
+RSSExpandedBlackBox2TestCase.java
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/svn/!svn/ver/1350/trunk/core/test/src/com/google/zxing/oned/rss/expanded/RSSExpandedBlackBox2TestCase.java
+END
+RSSExpandedBlackBox1TestCase.java
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/svn/!svn/ver/1350/trunk/core/test/src/com/google/zxing/oned/rss/expanded/RSSExpandedBlackBox1TestCase.java
+END
+RSSExpandedInternalTestCase.java
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svn/!svn/ver/1611/trunk/core/test/src/com/google/zxing/oned/rss/expanded/RSSExpandedInternalTestCase.java
+END
+BinaryUtilTest.java
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/!svn/ver/1611/trunk/core/test/src/com/google/zxing/oned/rss/expanded/BinaryUtilTest.java
+END
+RSSExpandedImage2binaryTestCase.java
+K 25
+svn:wc:ra_dav:version-url
+V 110
+/svn/!svn/ver/1611/trunk/core/test/src/com/google/zxing/oned/rss/expanded/RSSExpandedImage2binaryTestCase.java
+END
+RSSExpandedImage2stringTestCase.java
+K 25
+svn:wc:ra_dav:version-url
+V 110
+/svn/!svn/ver/1611/trunk/core/test/src/com/google/zxing/oned/rss/expanded/RSSExpandedImage2stringTestCase.java
+END
+BinaryUtil.java
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/!svn/ver/1611/trunk/core/test/src/com/google/zxing/oned/rss/expanded/BinaryUtil.java
+END
+ExpandedInformationDecoderTest.java
+K 25
+svn:wc:ra_dav:version-url
+V 109
+/svn/!svn/ver/1611/trunk/core/test/src/com/google/zxing/oned/rss/expanded/ExpandedInformationDecoderTest.java
+END
+RSSExpandedImage2resultTestCase.java
+K 25
+svn:wc:ra_dav:version-url
+V 110
+/svn/!svn/ver/1611/trunk/core/test/src/com/google/zxing/oned/rss/expanded/RSSExpandedImage2resultTestCase.java
+END
+BitArrayBuilderTest.java
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/!svn/ver/1611/trunk/core/test/src/com/google/zxing/oned/rss/expanded/BitArrayBuilderTest.java
+END

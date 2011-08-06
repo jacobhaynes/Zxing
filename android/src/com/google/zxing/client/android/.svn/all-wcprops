@@ -1,0 +1,107 @@
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/!svn/ver/1868/trunk/android/src/com/google/zxing/client/android
+END
+HelpActivity.java
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/!svn/ver/1589/trunk/android/src/com/google/zxing/client/android/HelpActivity.java
+END
+ViewfinderView.java
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/!svn/ver/1794/trunk/android/src/com/google/zxing/client/android/ViewfinderView.java
+END
+ViewfinderResultPointCallback.java
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/svn/!svn/ver/1125/trunk/android/src/com/google/zxing/client/android/ViewfinderResultPointCallback.java
+END
+DecodeFormatManager.java
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/!svn/ver/1776/trunk/android/src/com/google/zxing/client/android/DecodeFormatManager.java
+END
+PreferencesActivity.java
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/!svn/ver/1769/trunk/android/src/com/google/zxing/client/android/PreferencesActivity.java
+END
+FinishListener.java
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/!svn/ver/1529/trunk/android/src/com/google/zxing/client/android/FinishListener.java
+END
+AndroidHttpClient.java
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/!svn/ver/1617/trunk/android/src/com/google/zxing/client/android/AndroidHttpClient.java
+END
+BeepManager.java
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/!svn/ver/1621/trunk/android/src/com/google/zxing/client/android/BeepManager.java
+END
+DecodeHandler.java
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/!svn/ver/1814/trunk/android/src/com/google/zxing/client/android/DecodeHandler.java
+END
+Contents.java
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/!svn/ver/1295/trunk/android/src/com/google/zxing/client/android/Contents.java
+END
+DecodeThread.java
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/!svn/ver/1807/trunk/android/src/com/google/zxing/client/android/DecodeThread.java
+END
+Intents.java
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/!svn/ver/1866/trunk/android/src/com/google/zxing/client/android/Intents.java
+END
+CaptureActivityHandler.java
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/!svn/ver/1589/trunk/android/src/com/google/zxing/client/android/CaptureActivityHandler.java
+END
+CaptureActivity.java
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/!svn/ver/1813/trunk/android/src/com/google/zxing/client/android/CaptureActivity.java
+END
+LocaleManager.java
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/!svn/ver/1815/trunk/android/src/com/google/zxing/client/android/LocaleManager.java
+END
+PlanarYUVLuminanceSource.java
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/!svn/ver/1769/trunk/android/src/com/google/zxing/client/android/PlanarYUVLuminanceSource.java
+END
+InactivityTimer.java
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/!svn/ver/1809/trunk/android/src/com/google/zxing/client/android/InactivityTimer.java
+END

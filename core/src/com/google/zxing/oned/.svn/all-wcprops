@@ -1,0 +1,137 @@
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/svn/!svn/ver/1863/trunk/core/src/com/google/zxing/oned
+END
+ITFWriter.java
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/!svn/ver/1517/trunk/core/src/com/google/zxing/oned/ITFWriter.java
+END
+EANManufacturerOrgSupport.java
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/!svn/ver/1438/trunk/core/src/com/google/zxing/oned/EANManufacturerOrgSupport.java
+END
+CodaBarReader.java
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/!svn/ver/1795/trunk/core/src/com/google/zxing/oned/CodaBarReader.java
+END
+Code128Reader.java
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/!svn/ver/1822/trunk/core/src/com/google/zxing/oned/Code128Reader.java
+END
+UPCEANReader.java
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/!svn/ver/1519/trunk/core/src/com/google/zxing/oned/UPCEANReader.java
+END
+UPCAWriter.java
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/!svn/ver/1625/trunk/core/src/com/google/zxing/oned/UPCAWriter.java
+END
+Code93Reader.java
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/!svn/ver/1398/trunk/core/src/com/google/zxing/oned/Code93Reader.java
+END
+EAN8Reader.java
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/!svn/ver/1195/trunk/core/src/com/google/zxing/oned/EAN8Reader.java
+END
+EAN13Writer.java
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/!svn/ver/1268/trunk/core/src/com/google/zxing/oned/EAN13Writer.java
+END
+Code39Writer.java
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/!svn/ver/1795/trunk/core/src/com/google/zxing/oned/Code39Writer.java
+END
+OneDReader.java
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/!svn/ver/1398/trunk/core/src/com/google/zxing/oned/OneDReader.java
+END
+UPCEReader.java
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/!svn/ver/1195/trunk/core/src/com/google/zxing/oned/UPCEReader.java
+END
+ITFReader.java
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/!svn/ver/1863/trunk/core/src/com/google/zxing/oned/ITFReader.java
+END
+Code128Writer.java
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/!svn/ver/1825/trunk/core/src/com/google/zxing/oned/Code128Writer.java
+END
+UPCEANWriter.java
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/!svn/ver/1268/trunk/core/src/com/google/zxing/oned/UPCEANWriter.java
+END
+MultiFormatUPCEANReader.java
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/!svn/ver/1572/trunk/core/src/com/google/zxing/oned/MultiFormatUPCEANReader.java
+END
+UPCAReader.java
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/!svn/ver/1195/trunk/core/src/com/google/zxing/oned/UPCAReader.java
+END
+UPCEANExtensionSupport.java
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/!svn/ver/1608/trunk/core/src/com/google/zxing/oned/UPCEANExtensionSupport.java
+END
+EAN8Writer.java
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/!svn/ver/1268/trunk/core/src/com/google/zxing/oned/EAN8Writer.java
+END
+EAN13Reader.java
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/!svn/ver/1195/trunk/core/src/com/google/zxing/oned/EAN13Reader.java
+END
+Code39Reader.java
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/!svn/ver/1398/trunk/core/src/com/google/zxing/oned/Code39Reader.java
+END
+MultiFormatOneDReader.java
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/!svn/ver/1775/trunk/core/src/com/google/zxing/oned/MultiFormatOneDReader.java
+END

@@ -1,0 +1,95 @@
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/!svn/ver/1866/trunk/core/src/com/google/zxing/common
+END
+PerspectiveTransform.java
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/!svn/ver/1143/trunk/core/src/com/google/zxing/common/PerspectiveTransform.java
+END
+BitMatrix.java
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/!svn/ver/1779/trunk/core/src/com/google/zxing/common/BitMatrix.java
+END
+BitArray.java
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/!svn/ver/1779/trunk/core/src/com/google/zxing/common/BitArray.java
+END
+ECI.java
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/!svn/ver/1795/trunk/core/src/com/google/zxing/common/ECI.java
+END
+BitSource.java
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/!svn/ver/1865/trunk/core/src/com/google/zxing/common/BitSource.java
+END
+DetectorResult.java
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/!svn/ver/1668/trunk/core/src/com/google/zxing/common/DetectorResult.java
+END
+GridSampler.java
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/!svn/ver/1795/trunk/core/src/com/google/zxing/common/GridSampler.java
+END
+DecoderResult.java
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/!svn/ver/1799/trunk/core/src/com/google/zxing/common/DecoderResult.java
+END
+DefaultGridSampler.java
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/!svn/ver/1620/trunk/core/src/com/google/zxing/common/DefaultGridSampler.java
+END
+StringUtils.java
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/!svn/ver/1795/trunk/core/src/com/google/zxing/common/StringUtils.java
+END
+HybridBinarizer.java
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/!svn/ver/1795/trunk/core/src/com/google/zxing/common/HybridBinarizer.java
+END
+Comparator.java
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/!svn/ver/455/trunk/core/src/com/google/zxing/common/Comparator.java
+END
+Collections.java
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/!svn/ver/706/trunk/core/src/com/google/zxing/common/Collections.java
+END
+GlobalHistogramBinarizer.java
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/!svn/ver/1779/trunk/core/src/com/google/zxing/common/GlobalHistogramBinarizer.java
+END
+CharacterSetECI.java
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/!svn/ver/1795/trunk/core/src/com/google/zxing/common/CharacterSetECI.java
+END

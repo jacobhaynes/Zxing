@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/!svn/ver/1820/trunk/core/src/com/google/zxing/qrcode/detector
+END
+FinderPatternFinder.java
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/!svn/ver/1795/trunk/core/src/com/google/zxing/qrcode/detector/FinderPatternFinder.java
+END
+AlignmentPattern.java
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/!svn/ver/918/trunk/core/src/com/google/zxing/qrcode/detector/AlignmentPattern.java
+END
+FinderPattern.java
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/!svn/ver/933/trunk/core/src/com/google/zxing/qrcode/detector/FinderPattern.java
+END
+FinderPatternInfo.java
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/!svn/ver/933/trunk/core/src/com/google/zxing/qrcode/detector/FinderPatternInfo.java
+END
+Detector.java
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/!svn/ver/1820/trunk/core/src/com/google/zxing/qrcode/detector/Detector.java
+END
+AlignmentPatternFinder.java
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/!svn/ver/1795/trunk/core/src/com/google/zxing/qrcode/detector/AlignmentPatternFinder.java
+END
