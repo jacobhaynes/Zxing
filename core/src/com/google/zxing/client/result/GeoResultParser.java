@@ -19,17 +19,14 @@ package com.google.zxing.client.result;
 import com.google.zxing.Result;
 
 /**
- * Parses a "geo:" URI result, which specifies a location on the surface of
- * the Earth as well as an optional altitude above the surface. See
- * <a href="http://tools.ietf.org/html/draft-mayrhofer-geo-uri-00">
+ * Parses a "geo:" URI result, which specifies a location on the surface of the
+ * Earth as well as an optional altitude above the surface. See <a
+ * href="http://tools.ietf.org/html/draft-mayrhofer-geo-uri-00">
  * http://tools.ietf.org/html/draft-mayrhofer-geo-uri-00</a>.
- *
+ * 
  * @author Sean Owen
  */
 final class GeoResultParser extends ResultParser {
-
-    private GeoResultParser() {
-    }
 
     public static GeoParsedResult parse(Result result) {
         String rawText = result.getText();
@@ -64,7 +61,8 @@ final class GeoResultParser extends ResultParser {
                 longitude = Double.parseDouble(geoURIWithoutQuery.substring(latitudeEnd + 1));
                 altitude = 0.0;
             } else {
-                longitude = Double.parseDouble(geoURIWithoutQuery.substring(latitudeEnd + 1, longitudeEnd));
+                longitude = Double.parseDouble(geoURIWithoutQuery.substring(latitudeEnd + 1,
+                        longitudeEnd));
                 altitude = Double.parseDouble(geoURIWithoutQuery.substring(longitudeEnd + 1));
             }
             if (longitude > 180.0 || longitude < -180.0 || altitude < 0) {
@@ -74,6 +72,9 @@ final class GeoResultParser extends ResultParser {
             return null;
         }
         return new GeoParsedResult(latitude, longitude, altitude, query);
+    }
+
+    private GeoResultParser() {
     }
 
 }

@@ -16,41 +16,46 @@
 
 package com.google.zxing.oned;
 
+import java.util.Hashtable;
+
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.Writer;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 
-import java.util.Hashtable;
-
 /**
- * <p>Encapsulates functionality and implementation that is common to UPC and EAN families
- * of one-dimensional barcodes.</p>
- *
+ * <p>
+ * Encapsulates functionality and implementation that is common to UPC and EAN
+ * families of one-dimensional barcodes.
+ * </p>
+ * 
  * @author aripollak@gmail.com (Ari Pollak)
  */
 public abstract class UPCEANWriter implements Writer {
 
-    @Override
-    public BitMatrix encode(String contents, BarcodeFormat format, int width, int height)
-            throws WriterException {
-        return encode(contents, format, width, height, null);
-    }
-
-    @Override
-    public BitMatrix encode(String contents, BarcodeFormat format, int width, int height,
-            Hashtable<?, ?> hints) throws WriterException {
-        if (contents == null || contents.length() == 0) {
-            throw new IllegalArgumentException("Found empty contents");
+    /**
+     * Appends the given pattern to the target array starting at pos.
+     * 
+     * @param startColor starting color - 0 for white, 1 for black
+     * @return the number of elements added to target.
+     */
+    protected static int appendPattern(byte[] target, int pos, int[] pattern, int startColor) {
+        if (startColor != 0 && startColor != 1) {
+            throw new IllegalArgumentException("startColor must be either 0 or 1, but got: "
+                    + startColor);
         }
 
-        if (width < 0 || height < 0) {
-            throw new IllegalArgumentException("Requested dimensions are too small: "
-                    + width + 'x' + height);
+        byte color = (byte)startColor;
+        int numAdded = 0;
+        for (int i = 0; i < pattern.length; i++) {
+            for (int j = 0; j < pattern[i]; j++) {
+                target[pos] = color;
+                pos += 1;
+                numAdded += 1;
+            }
+            color ^= 1; // flip color after each segment
         }
-
-        byte[] code = encode(contents);
-        return renderResult(code, width, height);
+        return numAdded;
     }
 
     /** @return a byte array of horizontal pixels (0 = white, 1 = black) */
@@ -73,34 +78,29 @@ public abstract class UPCEANWriter implements Writer {
         return output;
     }
 
-
-    /**
-     * Appends the given pattern to the target array starting at pos.
-     *
-     * @param startColor
-     *          starting color - 0 for white, 1 for black
-     * @return the number of elements added to target.
-     */
-    protected static int appendPattern(byte[] target, int pos, int[] pattern, int startColor) {
-        if (startColor != 0 && startColor != 1) {
-            throw new IllegalArgumentException(
-                    "startColor must be either 0 or 1, but got: " + startColor);
-        }
-
-        byte color = (byte) startColor;
-        int numAdded = 0;
-        for (int i = 0; i < pattern.length; i++) {
-            for (int j = 0; j < pattern[i]; j++) {
-                target[pos] = color;
-                pos += 1;
-                numAdded += 1;
-            }
-            color ^= 1; // flip color after each segment
-        }
-        return numAdded;
-    }
-
     /** @return a byte array of horizontal pixels (0 = white, 1 = black) */
     public abstract byte[] encode(String contents);
+
+    @Override
+    public BitMatrix encode(String contents, BarcodeFormat format, int width, int height)
+            throws WriterException {
+        return encode(contents, format, width, height, null);
+    }
+
+    @Override
+    public BitMatrix encode(String contents, BarcodeFormat format, int width, int height,
+            Hashtable<?, ?> hints) throws WriterException {
+        if (contents == null || contents.length() == 0) {
+            throw new IllegalArgumentException("Found empty contents");
+        }
+
+        if (width < 0 || height < 0) {
+            throw new IllegalArgumentException("Requested dimensions are too small: " + width + 'x'
+                    + height);
+        }
+
+        byte[] code = encode(contents);
+        return renderResult(code, width, height);
+    }
 
 }

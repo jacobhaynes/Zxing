@@ -16,9 +16,7 @@
 
 package com.google.zxing.client.android.history;
 
-import com.google.zxing.Result;
-import com.google.zxing.client.android.CaptureActivity;
-import com.google.zxing.client.android.R;
+import java.util.List;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -26,56 +24,60 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Message;
 
-import java.util.List;
+import com.google.zxing.Result;
+import com.google.zxing.client.android.CaptureActivity;
+import com.google.zxing.client.android.R;
 
 final class HistoryClickListener implements DialogInterface.OnClickListener {
 
-  private final HistoryManager historyManager;
-  private final CaptureActivity activity;
-  private final List<Result> items;
+    private final HistoryManager historyManager;
 
-  /**
-   * Handles clicks in the History dialog.
-   *
-   * @author dswitkin@google.com (Daniel Switkin)
-   * @author Sean Owen
-   */
-  HistoryClickListener(HistoryManager historyManager, CaptureActivity activity, List<Result> items) {
-    this.historyManager = historyManager;
-    this.activity = activity;
-    this.items = items;
-  }
+    private final CaptureActivity activity;
 
-  @Override
-public void onClick(DialogInterface dialogInterface, int i) {
-    if (i == items.size()) {
-      // Share history.
-      CharSequence history = historyManager.buildHistory();
-      Uri historyFile = HistoryManager.saveHistory(history.toString());
-      if (historyFile == null) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setMessage(R.string.msg_unmount_usb);
-        builder.setPositiveButton(R.string.button_ok, null);
-        builder.show();
-        return;
-      }
-      Intent intent = new Intent(Intent.ACTION_SEND, Uri.parse("mailto:"));
-      intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-      String subject = activity.getResources().getString(R.string.history_email_title);
-      intent.putExtra(Intent.EXTRA_SUBJECT, subject);
-      intent.putExtra(Intent.EXTRA_TEXT, subject);
-      intent.putExtra(Intent.EXTRA_STREAM, historyFile);
-      intent.setType("text/csv");
-      activity.startActivity(intent);
-    } else if (i == items.size() + 1) {
-      // Clear history.
-      historyManager.clearHistory();
-    } else {
-      // Display a single history entry.
-      Result result = items.get(i);
-      Message message = Message.obtain(activity.getHandler(), R.id.decode_succeeded, result);
-      message.sendToTarget();
+    private final List<Result> items;
+
+    /**
+     * Handles clicks in the History dialog.
+     * 
+     * @author dswitkin@google.com (Daniel Switkin)
+     * @author Sean Owen
+     */
+    HistoryClickListener(HistoryManager historyManager, CaptureActivity activity, List<Result> items) {
+        this.historyManager = historyManager;
+        this.activity = activity;
+        this.items = items;
     }
-  }
+
+    @Override
+    public void onClick(DialogInterface dialogInterface, int i) {
+        if (i == items.size()) {
+            // Share history.
+            CharSequence history = historyManager.buildHistory();
+            Uri historyFile = HistoryManager.saveHistory(history.toString());
+            if (historyFile == null) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                builder.setMessage(R.string.msg_unmount_usb);
+                builder.setPositiveButton(R.string.button_ok, null);
+                builder.show();
+                return;
+            }
+            Intent intent = new Intent(Intent.ACTION_SEND, Uri.parse("mailto:"));
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+            String subject = activity.getResources().getString(R.string.history_email_title);
+            intent.putExtra(Intent.EXTRA_SUBJECT, subject);
+            intent.putExtra(Intent.EXTRA_TEXT, subject);
+            intent.putExtra(Intent.EXTRA_STREAM, historyFile);
+            intent.setType("text/csv");
+            activity.startActivity(intent);
+        } else if (i == items.size() + 1) {
+            // Clear history.
+            historyManager.clearHistory();
+        } else {
+            // Display a single history entry.
+            Result result = items.get(i);
+            Message message = Message.obtain(activity.getHandler(), R.id.decode_succeeded, result);
+            message.sendToTarget();
+        }
+    }
 
 }

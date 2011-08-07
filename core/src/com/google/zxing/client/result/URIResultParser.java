@@ -25,28 +25,11 @@ import com.google.zxing.Result;
  */
 final class URIResultParser extends ResultParser {
 
-    private URIResultParser() {
-    }
-
-    public static URIParsedResult parse(Result result) {
-        String rawText = result.getText();
-        // We specifically handle the odd "URL" scheme here for simplicity
-        if (rawText != null && rawText.startsWith("URL:")) {
-            rawText = rawText.substring(4);
-        }
-        if (rawText != null) {
-            rawText = rawText.trim();
-        }
-        if (!isBasicallyValidURI(rawText)) {
-            return null;
-        }
-        return new URIParsedResult(rawText, null);
-    }
-
     /**
-     * Determines whether a string is not obviously not a URI. This implements crude checks; this class does not
-     * intend to strictly check URIs as its only function is to represent what is in a barcode, but, it does
-     * need to know when a string is obviously not a URI.
+     * Determines whether a string is not obviously not a URI. This implements
+     * crude checks; this class does not intend to strictly check URIs as its
+     * only function is to represent what is in a barcode, but, it does need to
+     * know when a string is obviously not a URI.
      */
     static boolean isBasicallyValidURI(String uri) {
         if (uri == null) {
@@ -93,6 +76,24 @@ final class URIResultParser extends ResultParser {
             }
         }
         return true;
+    }
+
+    public static URIParsedResult parse(Result result) {
+        String rawText = result.getText();
+        // We specifically handle the odd "URL" scheme here for simplicity
+        if (rawText != null && rawText.startsWith("URL:")) {
+            rawText = rawText.substring(4);
+        }
+        if (rawText != null) {
+            rawText = rawText.trim();
+        }
+        if (!isBasicallyValidURI(rawText)) {
+            return null;
+        }
+        return new URIParsedResult(rawText, null);
+    }
+
+    private URIResultParser() {
     }
 
 }

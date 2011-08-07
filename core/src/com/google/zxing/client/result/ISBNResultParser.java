@@ -26,9 +26,6 @@ import com.google.zxing.Result;
  */
 public class ISBNResultParser extends ResultParser {
 
-    private ISBNResultParser() {
-    }
-
     // ISBN-13 For Dummies
     // http://www.bisg.org/isbn-13/for.dummies.html
     public static ISBNParsedResult parse(Result result) {
@@ -49,6 +46,9 @@ public class ISBNResultParser extends ResultParser {
         }
 
         return new ISBNParsedResult(rawText);
+    }
+
+    private ISBNResultParser() {
     }
 
 }

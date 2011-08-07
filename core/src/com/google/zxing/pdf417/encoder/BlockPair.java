@@ -19,6 +19,7 @@ package com.google.zxing.pdf417.encoder;
 final class BlockPair {
 
     private final byte[] dataBytes;
+
     private final byte[] errorCorrectionBytes;
 
     BlockPair(byte[] data, byte[] errorCorrection) {

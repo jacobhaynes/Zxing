@@ -22,7 +22,9 @@ package com.google.zxing.client.result;
 public final class TelParsedResult extends ParsedResult {
 
     private final String number;
+
     private final String telURI;
+
     private final String title;
 
     public TelParsedResult(String number, String telURI, String title) {
@@ -30,6 +32,14 @@ public final class TelParsedResult extends ParsedResult {
         this.number = number;
         this.telURI = telURI;
         this.title = title;
+    }
+
+    @Override
+    public String getDisplayResult() {
+        StringBuffer result = new StringBuffer(20);
+        maybeAppend(number, result);
+        maybeAppend(title, result);
+        return result.toString();
     }
 
     public String getNumber() {
@@ -42,14 +52,6 @@ public final class TelParsedResult extends ParsedResult {
 
     public String getTitle() {
         return title;
-    }
-
-    @Override
-    public String getDisplayResult() {
-        StringBuffer result = new StringBuffer(20);
-        maybeAppend(number, result);
-        maybeAppend(title, result);
-        return result.toString();
     }
 
 }

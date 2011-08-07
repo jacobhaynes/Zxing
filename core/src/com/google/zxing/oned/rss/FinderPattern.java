@@ -21,28 +21,29 @@ import com.google.zxing.ResultPoint;
 public final class FinderPattern {
 
     private final int value;
+
     private final int[] startEnd;
+
     private final ResultPoint[] resultPoints;
 
     public FinderPattern(int value, int[] startEnd, int start, int end, int rowNumber) {
         this.value = value;
         this.startEnd = startEnd;
         this.resultPoints = new ResultPoint[] {
-                new ResultPoint(start, rowNumber),
-                new ResultPoint(end, rowNumber),
+                new ResultPoint(start, rowNumber), new ResultPoint(end, rowNumber),
         };
     }
 
-    public int getValue() {
-        return value;
+    public ResultPoint[] getResultPoints() {
+        return resultPoints;
     }
 
     public int[] getStartEnd() {
         return startEnd;
     }
 
-    public ResultPoint[] getResultPoints() {
-        return resultPoints;
+    public int getValue() {
+        return value;
     }
 
 }

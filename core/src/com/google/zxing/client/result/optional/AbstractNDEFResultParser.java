@@ -16,18 +16,21 @@
 
 package com.google.zxing.client.result.optional;
 
-import com.google.zxing.client.result.ResultParser;
-
 import java.io.UnsupportedEncodingException;
 
+import com.google.zxing.client.result.ResultParser;
+
 /**
- * <p>Superclass for classes encapsulating results in the NDEF format.
- * See <a href="http://www.nfc-forum.org/specs/">http://www.nfc-forum.org/specs/</a>.</p>
- *
- * <p>This code supports a limited subset of NDEF messages, ones that are plausibly
- * useful in 2D barcode formats. This generally includes 1-record messages, no chunking,
- * "short record" syntax, no ID field.</p>
- *
+ * <p>
+ * Superclass for classes encapsulating results in the NDEF format. See <a
+ * href="http://www.nfc-forum.org/specs/">http://www.nfc-forum.org/specs/</a>.
+ * </p>
+ * <p>
+ * This code supports a limited subset of NDEF messages, ones that are plausibly
+ * useful in 2D barcode formats. This generally includes 1-record messages, no
+ * chunking, "short record" syntax, no ID field.
+ * </p>
+ * 
  * @author Sean Owen
  */
 abstract class AbstractNDEFResultParser extends ResultParser {
@@ -36,7 +39,8 @@ abstract class AbstractNDEFResultParser extends ResultParser {
         try {
             return new String(bytes, offset, length, encoding);
         } catch (UnsupportedEncodingException uee) {
-            // This should only be used when 'encoding' is an encoding that must necessarily
+            // This should only be used when 'encoding' is an encoding that must
+            // necessarily
             // be supported by the JVM, like UTF-8
             throw new RuntimeException("Platform does not support required encoding: " + uee);
         }

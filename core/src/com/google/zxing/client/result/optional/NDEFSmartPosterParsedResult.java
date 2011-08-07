@@ -25,12 +25,17 @@ import com.google.zxing.client.result.ParsedResultType;
 public final class NDEFSmartPosterParsedResult extends ParsedResult {
 
     public static final int ACTION_UNSPECIFIED = -1;
+
     public static final int ACTION_DO = 0;
+
     public static final int ACTION_SAVE = 1;
+
     public static final int ACTION_OPEN = 2;
 
     private final String title;
+
     private final String uri;
+
     private final int action;
 
     NDEFSmartPosterParsedResult(int action, String uri, String title) {
@@ -38,14 +43,6 @@ public final class NDEFSmartPosterParsedResult extends ParsedResult {
         this.action = action;
         this.uri = uri;
         this.title = title;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getURI() {
-        return uri;
     }
 
     public int getAction() {
@@ -59,6 +56,14 @@ public final class NDEFSmartPosterParsedResult extends ParsedResult {
         } else {
             return title + '\n' + uri;
         }
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getURI() {
+        return uri;
     }
 
 }

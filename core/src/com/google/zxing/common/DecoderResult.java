@@ -19,17 +19,22 @@ package com.google.zxing.common;
 import java.util.Vector;
 
 /**
- * <p>Encapsulates the result of decoding a matrix of bits. This typically
- * applies to 2D barcode formats. For now it contains the raw bytes obtained,
- * as well as a String interpretation of those bytes, if applicable.</p>
- *
+ * <p>
+ * Encapsulates the result of decoding a matrix of bits. This typically applies
+ * to 2D barcode formats. For now it contains the raw bytes obtained, as well as
+ * a String interpretation of those bytes, if applicable.
+ * </p>
+ * 
  * @author Sean Owen
  */
 public final class DecoderResult {
 
     private final byte[] rawBytes;
+
     private final String text;
+
     private final Vector<?> byteSegments;
+
     private final String ecLevel;
 
     public DecoderResult(byte[] rawBytes, String text, Vector<?> byteSegments, String ecLevel) {
@@ -42,20 +47,20 @@ public final class DecoderResult {
         this.ecLevel = ecLevel;
     }
 
-    public byte[] getRawBytes() {
-        return rawBytes;
-    }
-
-    public String getText() {
-        return text;
-    }
-
     public Vector<?> getByteSegments() {
         return byteSegments;
     }
 
     public String getECLevel() {
         return ecLevel;
+    }
+
+    public byte[] getRawBytes() {
+        return rawBytes;
+    }
+
+    public String getText() {
+        return text;
     }
 
 }

@@ -16,14 +16,14 @@
 
 package com.google.zxing.client.result;
 
-import com.google.zxing.Result;
-
 import java.util.Hashtable;
+
+import com.google.zxing.Result;
 
 /**
  * Represents a result that encodes an e-mail address, either as a plain address
  * like "joe@example.org" or a mailto: URL like "mailto:joe@example.org".
- *
+ * 
  * @author Sean Owen
  */
 final class EmailAddressResultParser extends ResultParser {
@@ -35,7 +35,8 @@ final class EmailAddressResultParser extends ResultParser {
         }
         String emailAddress;
         if (rawText.startsWith("mailto:") || rawText.startsWith("MAILTO:")) {
-            // If it starts with mailto:, assume it is definitely trying to be an email address
+            // If it starts with mailto:, assume it is definitely trying to be
+            // an email address
             emailAddress = rawText.substring(7);
             int queryStart = emailAddress.indexOf('?');
             if (queryStart >= 0) {

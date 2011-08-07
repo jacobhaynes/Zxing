@@ -16,6 +16,9 @@
 
 package com.google.zxing.multi.qrcode;
 
+import java.util.Hashtable;
+import java.util.Vector;
+
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.BinaryBitmap;
 import com.google.zxing.NotFoundException;
@@ -29,12 +32,9 @@ import com.google.zxing.multi.MultipleBarcodeReader;
 import com.google.zxing.multi.qrcode.detector.MultiDetector;
 import com.google.zxing.qrcode.QRCodeReader;
 
-import java.util.Hashtable;
-import java.util.Vector;
-
 /**
  * This implementation can detect and decode multiple QR Codes in an image.
- *
+ * 
  * @author Sean Owen
  * @author Hannes Erven
  */
@@ -48,20 +48,24 @@ public final class QRCodeMultiReader extends QRCodeReader implements MultipleBar
     }
 
     @Override
-    public Result[] decodeMultiple(BinaryBitmap image, Hashtable<?, ?> hints) throws NotFoundException {
+    public Result[] decodeMultiple(BinaryBitmap image, Hashtable<?, ?> hints)
+            throws NotFoundException {
         Vector<Result> results = new Vector<Result>();
-        DetectorResult[] detectorResult = new MultiDetector(image.getBlackMatrix()).detectMulti(hints);
+        DetectorResult[] detectorResult = new MultiDetector(image.getBlackMatrix())
+                .detectMulti(hints);
         for (int i = 0; i < detectorResult.length; i++) {
             try {
                 DecoderResult decoderResult = getDecoder().decode(detectorResult[i].getBits());
                 ResultPoint[] points = detectorResult[i].getPoints();
-                Result result = new Result(decoderResult.getText(), decoderResult.getRawBytes(), points,
-                        BarcodeFormat.QR_CODE);
+                Result result = new Result(decoderResult.getText(), decoderResult.getRawBytes(),
+                        points, BarcodeFormat.QR_CODE);
                 if (decoderResult.getByteSegments() != null) {
-                    result.putMetadata(ResultMetadataType.BYTE_SEGMENTS, decoderResult.getByteSegments());
+                    result.putMetadata(ResultMetadataType.BYTE_SEGMENTS,
+                            decoderResult.getByteSegments());
                 }
                 if (decoderResult.getECLevel() != null) {
-                    result.putMetadata(ResultMetadataType.ERROR_CORRECTION_LEVEL, decoderResult.getECLevel().toString());
+                    result.putMetadata(ResultMetadataType.ERROR_CORRECTION_LEVEL, decoderResult
+                            .getECLevel().toString());
                 }
                 results.addElement(result);
             } catch (ReaderException re) {

@@ -17,26 +17,17 @@
 package com.google.zxing.common;
 
 /**
- * Superclass of classes encapsulating types ECIs, according to "Extended Channel Interpretations"
- * 5.3 of ISO 18004.
- *
+ * Superclass of classes encapsulating types ECIs, according to
+ * "Extended Channel Interpretations" 5.3 of ISO 18004.
+ * 
  * @author Sean Owen
  */
 public abstract class ECI {
 
-    private final int value;
-
-    ECI(int value) {
-        this.value = value;
-    }
-
-    public int getValue() {
-        return value;
-    }
-
     /**
      * @param value ECI value
-     * @return ECI representing ECI of given value, or null if it is legal but unsupported
+     * @return ECI representing ECI of given value, or null if it is legal but
+     *         unsupported
      * @throws IllegalArgumentException if ECI value is invalid
      */
     public static ECI getECIByValue(int value) {
@@ -47,6 +38,16 @@ public abstract class ECI {
             return CharacterSetECI.getCharacterSetECIByValue(value);
         }
         return null;
+    }
+
+    private final int value;
+
+    ECI(int value) {
+        this.value = value;
+    }
+
+    public int getValue() {
+        return value;
     }
 
 }

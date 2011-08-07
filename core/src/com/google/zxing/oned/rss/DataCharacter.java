@@ -19,6 +19,7 @@ package com.google.zxing.oned.rss;
 public class DataCharacter {
 
     private final int value;
+
     private final int checksumPortion;
 
     public DataCharacter(int value, int checksumPortion) {
@@ -26,12 +27,12 @@ public class DataCharacter {
         this.checksumPortion = checksumPortion;
     }
 
-    public int getValue() {
-        return value;
-    }
-
     public int getChecksumPortion() {
         return checksumPortion;
+    }
+
+    public int getValue() {
+        return value;
     }
 
 }

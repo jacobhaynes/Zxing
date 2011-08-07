@@ -19,17 +19,17 @@ package com.google.zxing.client.result;
 import com.google.zxing.Result;
 
 /**
- * <p>Parses an "smtp:" URI result, whose format is not standardized but appears to be like:
- * <code>smtp(:subject(:body))</code>.</p>
- *
- * <p>See http://code.google.com/p/zxing/issues/detail?id=536</p>
- *
+ * <p>
+ * Parses an "smtp:" URI result, whose format is not standardized but appears to
+ * be like: <code>smtp(:subject(:body))</code>.
+ * </p>
+ * <p>
+ * See http://code.google.com/p/zxing/issues/detail?id=536
+ * </p>
+ * 
  * @author Sean Owen
  */
 final class SMTPResultParser {
-
-    private SMTPResultParser() {
-    }
 
     public static EmailAddressParsedResult parse(Result result) {
         String rawText = result.getText();
@@ -54,5 +54,8 @@ final class SMTPResultParser {
         }
         String mailtoURI = "mailto:" + emailAddress;
         return new EmailAddressParsedResult(emailAddress, subject, body, mailtoURI);
+    }
+
+    private SMTPResultParser() {
     }
 }

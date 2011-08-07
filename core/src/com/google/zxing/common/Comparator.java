@@ -17,8 +17,8 @@
 package com.google.zxing.common;
 
 /**
- * This is merely a clone of <code>Comparator</code> since it is not available in
- * CLDC 1.1 / MIDP 2.0.
+ * This is merely a clone of <code>Comparator</code> since it is not available
+ * in CLDC 1.1 / MIDP 2.0.
  */
 public interface Comparator {
 

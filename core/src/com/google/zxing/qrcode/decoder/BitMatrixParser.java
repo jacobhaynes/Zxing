@@ -25,7 +25,9 @@ import com.google.zxing.common.BitMatrix;
 final class BitMatrixParser {
 
     private final BitMatrix bitMatrix;
+
     private Version parsedVersion;
+
     private FormatInformation parsedFormatInfo;
 
     /**
@@ -40,12 +42,84 @@ final class BitMatrixParser {
         this.bitMatrix = bitMatrix;
     }
 
+    private int copyBit(int i, int j, int versionBits) {
+        return bitMatrix.get(i, j) ? (versionBits << 1) | 0x1 : versionBits << 1;
+    }
+
     /**
-     * <p>Reads format information from one of its two locations within the QR Code.</p>
-     *
+     * <p>
+     * Reads the bits in the {@link BitMatrix} representing the finder pattern
+     * in the correct order in order to reconstitute the codewords bytes
+     * contained within the QR Code.
+     * </p>
+     * 
+     * @return bytes encoded within the QR Code
+     * @throws FormatException if the exact number of bytes expected is not read
+     */
+    byte[] readCodewords() throws FormatException {
+
+        FormatInformation formatInfo = readFormatInformation();
+        Version version = readVersion();
+
+        // Get the data mask for the format used in this QR Code. This will
+        // exclude
+        // some bits from reading as we wind through the bit matrix.
+        DataMask dataMask = DataMask.forReference(formatInfo.getDataMask());
+        int dimension = bitMatrix.getHeight();
+        dataMask.unmaskBitMatrix(bitMatrix, dimension);
+
+        BitMatrix functionPattern = version.buildFunctionPattern();
+
+        boolean readingUp = true;
+        byte[] result = new byte[version.getTotalCodewords()];
+        int resultOffset = 0;
+        int currentByte = 0;
+        int bitsRead = 0;
+        // Read columns in pairs, from right to left
+        for (int j = dimension - 1; j > 0; j -= 2) {
+            if (j == 6) {
+                // Skip whole column with vertical alignment pattern;
+                // saves time and makes the other code proceed more cleanly
+                j--;
+            }
+            // Read alternatingly from bottom to top then top to bottom
+            for (int count = 0; count < dimension; count++) {
+                int i = readingUp ? dimension - 1 - count : count;
+                for (int col = 0; col < 2; col++) {
+                    // Ignore bits covered by the function pattern
+                    if (!functionPattern.get(j - col, i)) {
+                        // Read a bit
+                        bitsRead++;
+                        currentByte <<= 1;
+                        if (bitMatrix.get(j - col, i)) {
+                            currentByte |= 1;
+                        }
+                        // If we've made a whole byte, save it off
+                        if (bitsRead == 8) {
+                            result[resultOffset++] = (byte)currentByte;
+                            bitsRead = 0;
+                            currentByte = 0;
+                        }
+                    }
+                }
+            }
+            readingUp ^= true; // readingUp = !readingUp; // switch directions
+        }
+        if (resultOffset != version.getTotalCodewords()) {
+            throw FormatException.getFormatInstance();
+        }
+        return result;
+    }
+
+    /**
+     * <p>
+     * Reads format information from one of its two locations within the QR
+     * Code.
+     * </p>
+     * 
      * @return {@link FormatInformation} encapsulating the QR Code's format info
-     * @throws FormatException if both format information locations cannot be parsed as
-     * the valid encoding of format information
+     * @throws FormatException if both format information locations cannot be
+     *             parsed as the valid encoding of format information
      */
     FormatInformation readFormatInformation() throws FormatException {
 
@@ -78,7 +152,8 @@ final class BitMatrixParser {
             formatInfoBits2 = copyBit(i, 8, formatInfoBits2);
         }
 
-        parsedFormatInfo = FormatInformation.decodeFormatInformation(formatInfoBits1, formatInfoBits2);
+        parsedFormatInfo = FormatInformation.decodeFormatInformation(formatInfoBits1,
+                formatInfoBits2);
         if (parsedFormatInfo != null) {
             return parsedFormatInfo;
         }
@@ -86,11 +161,14 @@ final class BitMatrixParser {
     }
 
     /**
-     * <p>Reads version information from one of its two locations within the QR Code.</p>
-     *
+     * <p>
+     * Reads version information from one of its two locations within the QR
+     * Code.
+     * </p>
+     * 
      * @return {@link Version} encapsulating the QR Code's version
-     * @throws FormatException if both version information locations cannot be parsed as
-     * the valid encoding of version information
+     * @throws FormatException if both version information locations cannot be
+     *             parsed as the valid encoding of version information
      */
     Version readVersion() throws FormatException {
 
@@ -132,72 +210,6 @@ final class BitMatrixParser {
             return parsedVersion;
         }
         throw FormatException.getFormatInstance();
-    }
-
-    private int copyBit(int i, int j, int versionBits) {
-        return bitMatrix.get(i, j) ? (versionBits << 1) | 0x1 : versionBits << 1;
-    }
-
-    /**
-     * <p>Reads the bits in the {@link BitMatrix} representing the finder pattern in the
-     * correct order in order to reconstitute the codewords bytes contained within the
-     * QR Code.</p>
-     *
-     * @return bytes encoded within the QR Code
-     * @throws FormatException if the exact number of bytes expected is not read
-     */
-    byte[] readCodewords() throws FormatException {
-
-        FormatInformation formatInfo = readFormatInformation();
-        Version version = readVersion();
-
-        // Get the data mask for the format used in this QR Code. This will exclude
-        // some bits from reading as we wind through the bit matrix.
-        DataMask dataMask = DataMask.forReference(formatInfo.getDataMask());
-        int dimension = bitMatrix.getHeight();
-        dataMask.unmaskBitMatrix(bitMatrix, dimension);
-
-        BitMatrix functionPattern = version.buildFunctionPattern();
-
-        boolean readingUp = true;
-        byte[] result = new byte[version.getTotalCodewords()];
-        int resultOffset = 0;
-        int currentByte = 0;
-        int bitsRead = 0;
-        // Read columns in pairs, from right to left
-        for (int j = dimension - 1; j > 0; j -= 2) {
-            if (j == 6) {
-                // Skip whole column with vertical alignment pattern;
-                // saves time and makes the other code proceed more cleanly
-                j--;
-            }
-            // Read alternatingly from bottom to top then top to bottom
-            for (int count = 0; count < dimension; count++) {
-                int i = readingUp ? dimension - 1 - count : count;
-                for (int col = 0; col < 2; col++) {
-                    // Ignore bits covered by the function pattern
-                    if (!functionPattern.get(j - col, i)) {
-                        // Read a bit
-                        bitsRead++;
-                        currentByte <<= 1;
-                        if (bitMatrix.get(j - col, i)) {
-                            currentByte |= 1;
-                        }
-                        // If we've made a whole byte, save it off
-                        if (bitsRead == 8) {
-                            result[resultOffset++] = (byte) currentByte;
-                            bitsRead = 0;
-                            currentByte = 0;
-                        }
-                    }
-                }
-            }
-            readingUp ^= true; // readingUp = !readingUp; // switch directions
-        }
-        if (resultOffset != version.getTotalCodewords()) {
-            throw FormatException.getFormatInstance();
-        }
-        return result;
     }
 
 }

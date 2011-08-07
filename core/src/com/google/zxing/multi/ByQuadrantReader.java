@@ -16,6 +16,8 @@
 
 package com.google.zxing.multi;
 
+import java.util.Hashtable;
+
 import com.google.zxing.BinaryBitmap;
 import com.google.zxing.ChecksumException;
 import com.google.zxing.FormatException;
@@ -23,15 +25,14 @@ import com.google.zxing.NotFoundException;
 import com.google.zxing.Reader;
 import com.google.zxing.Result;
 
-import java.util.Hashtable;
-
 /**
- * This class attempts to decode a barcode from an image, not by scanning the whole image,
- * but by scanning subsets of the image. This is important when there may be multiple barcodes in
- * an image, and detecting a barcode may find parts of multiple barcode and fail to decode
- * (e.g. QR Codes). Instead this scans the four quadrants of the image -- and also the center
- * 'quadrant' to cover the case where a barcode is found in the center.
- *
+ * This class attempts to decode a barcode from an image, not by scanning the
+ * whole image, but by scanning subsets of the image. This is important when
+ * there may be multiple barcodes in an image, and detecting a barcode may find
+ * parts of multiple barcode and fail to decode (e.g. QR Codes). Instead this
+ * scans the four quadrants of the image -- and also the center 'quadrant' to
+ * cover the case where a barcode is found in the center.
+ * 
  * @see GenericMultipleBarcodeReader
  */
 public final class ByQuadrantReader implements Reader {
@@ -43,14 +44,14 @@ public final class ByQuadrantReader implements Reader {
     }
 
     @Override
-    public Result decode(BinaryBitmap image)
-            throws NotFoundException, ChecksumException, FormatException {
+    public Result decode(BinaryBitmap image) throws NotFoundException, ChecksumException,
+            FormatException {
         return decode(image, null);
     }
 
     @Override
-    public Result decode(BinaryBitmap image, Hashtable<?, ?> hints)
-            throws NotFoundException, ChecksumException, FormatException {
+    public Result decode(BinaryBitmap image, Hashtable<?, ?> hints) throws NotFoundException,
+            ChecksumException, FormatException {
 
         int width = image.getWidth();
         int height = image.getHeight();

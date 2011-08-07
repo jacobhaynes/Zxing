@@ -16,6 +16,8 @@
 
 package com.google.zxing.pdf417;
 
+import java.util.Hashtable;
+
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.BinaryBitmap;
 import com.google.zxing.DecodeHintType;
@@ -30,59 +32,21 @@ import com.google.zxing.common.DetectorResult;
 import com.google.zxing.pdf417.decoder.Decoder;
 import com.google.zxing.pdf417.detector.Detector;
 
-import java.util.Hashtable;
-
 /**
  * This implementation can detect and decode PDF417 codes in an image.
- *
+ * 
  * @author SITA Lab (kevin.osullivan@sita.aero)
  */
 public final class PDF417Reader implements Reader {
 
     private static final ResultPoint[] NO_POINTS = new ResultPoint[0];
 
-    private final Decoder decoder = new Decoder();
-
     /**
-     * Locates and decodes a PDF417 code in an image.
-     *
-     * @return a String representing the content encoded by the PDF417 code
-     * @throws NotFoundException if a PDF417 code cannot be found,
-     * @throws FormatException if a PDF417 cannot be decoded
-     */
-    @Override
-    public Result decode(BinaryBitmap image) throws NotFoundException, FormatException {
-        return decode(image, null);
-    }
-
-    @Override
-    public Result decode(BinaryBitmap image, Hashtable<?, ?> hints) throws NotFoundException, FormatException {
-        DecoderResult decoderResult;
-        ResultPoint[] points;
-        if (hints != null && hints.containsKey(DecodeHintType.PURE_BARCODE)) {
-            BitMatrix bits = extractPureBits(image.getBlackMatrix());
-            decoderResult = decoder.decode(bits);
-            points = NO_POINTS;
-        } else {
-            DetectorResult detectorResult = new Detector(image).detect();
-            decoderResult = decoder.decode(detectorResult.getBits());
-            points = detectorResult.getPoints();
-        }
-        return new Result(decoderResult.getText(), decoderResult.getRawBytes(), points,
-                BarcodeFormat.PDF_417);
-    }
-
-    @Override
-    public void reset() {
-        // do nothing
-    }
-
-    /**
-     * This method detects a code in a "pure" image -- that is, pure monochrome image
-     * which contains only an unrotated, unskewed, image of a code, with some white border
-     * around it. This is a specialized method that works exceptionally fast in this special
-     * case.
-     *
+     * This method detects a code in a "pure" image -- that is, pure monochrome
+     * image which contains only an unrotated, unskewed, image of a code, with
+     * some white border around it. This is a specialized method that works
+     * exceptionally fast in this special case.
+     * 
      * @see com.google.zxing.qrcode.QRCodeReader#extractPureBits(BitMatrix)
      * @see com.google.zxing.datamatrix.DataMatrixReader#extractPureBits(BitMatrix)
      */
@@ -127,23 +91,27 @@ public final class PDF417Reader implements Reader {
         return bits;
     }
 
-    private static int moduleSize(int[] leftTopBlack, BitMatrix image) throws NotFoundException {
-        int x = leftTopBlack[0];
-        int y = leftTopBlack[1];
+    private static int findPatternEnd(int x, int y, BitMatrix image) throws NotFoundException {
         int width = image.getWidth();
-        while (x < width && image.get(x, y)) {
-            x++;
+        int end = width - 1;
+        // end should be on black
+        while (end > x && !image.get(end, y)) {
+            end--;
         }
-        if (x == width) {
+        int transitions = 0;
+        boolean black = true;
+        while (end > x && transitions < 9) {
+            end--;
+            boolean newBlack = image.get(end, y);
+            if (black != newBlack) {
+                transitions++;
+            }
+            black = newBlack;
+        }
+        if (end == x) {
             throw NotFoundException.getNotFoundInstance();
         }
-
-        int moduleSize = (x - leftTopBlack[0]) >>> 3; // We've crossed left first bar, which is 8x
-            if (moduleSize == 0) {
-                throw NotFoundException.getNotFoundInstance();
-            }
-
-            return moduleSize;
+        return end;
     }
 
     private static int findPatternStart(int x, int y, BitMatrix image) throws NotFoundException {
@@ -166,27 +134,61 @@ public final class PDF417Reader implements Reader {
         return start;
     }
 
-    private static int findPatternEnd(int x, int y, BitMatrix image) throws NotFoundException {
+    private static int moduleSize(int[] leftTopBlack, BitMatrix image) throws NotFoundException {
+        int x = leftTopBlack[0];
+        int y = leftTopBlack[1];
         int width = image.getWidth();
-        int end = width - 1;
-        // end should be on black
-        while (end > x && !image.get(end, y)) {
-            end--;
+        while (x < width && image.get(x, y)) {
+            x++;
         }
-        int transitions = 0;
-        boolean black = true;
-        while (end > x && transitions < 9) {
-            end--;
-            boolean newBlack = image.get(end, y);
-            if (black != newBlack) {
-                transitions++;
-            }
-            black = newBlack;
-        }
-        if (end == x) {
+        if (x == width) {
             throw NotFoundException.getNotFoundInstance();
         }
-        return end;
+
+        int moduleSize = (x - leftTopBlack[0]) >>> 3; // We've crossed left
+                                                      // first bar, which is 8x
+        if (moduleSize == 0) {
+            throw NotFoundException.getNotFoundInstance();
+        }
+
+        return moduleSize;
+    }
+
+    private final Decoder decoder = new Decoder();
+
+    /**
+     * Locates and decodes a PDF417 code in an image.
+     * 
+     * @return a String representing the content encoded by the PDF417 code
+     * @throws NotFoundException if a PDF417 code cannot be found,
+     * @throws FormatException if a PDF417 cannot be decoded
+     */
+    @Override
+    public Result decode(BinaryBitmap image) throws NotFoundException, FormatException {
+        return decode(image, null);
+    }
+
+    @Override
+    public Result decode(BinaryBitmap image, Hashtable<?, ?> hints) throws NotFoundException,
+            FormatException {
+        DecoderResult decoderResult;
+        ResultPoint[] points;
+        if (hints != null && hints.containsKey(DecodeHintType.PURE_BARCODE)) {
+            BitMatrix bits = extractPureBits(image.getBlackMatrix());
+            decoderResult = decoder.decode(bits);
+            points = NO_POINTS;
+        } else {
+            DetectorResult detectorResult = new Detector(image).detect();
+            decoderResult = decoder.decode(detectorResult.getBits());
+            points = detectorResult.getPoints();
+        }
+        return new Result(decoderResult.getText(), decoderResult.getRawBytes(), points,
+                BarcodeFormat.PDF_417);
+    }
+
+    @Override
+    public void reset() {
+        // do nothing
     }
 
 }

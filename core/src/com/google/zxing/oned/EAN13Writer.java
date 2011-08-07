@@ -16,16 +16,15 @@
 
 package com.google.zxing.oned;
 
+import java.util.Hashtable;
+
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 
-import java.util.Hashtable;
-
-
 /**
  * This object renders an EAN13 code as a {@link BitMatrix}.
- *
+ * 
  * @author aripollak@gmail.com (Ari Pollak)
  */
 public final class EAN13Writer extends UPCEANWriter {
@@ -35,16 +34,6 @@ public final class EAN13Writer extends UPCEANWriter {
             5 + // middle guard
             (7 * 6) + // right bars
             3; // end guard
-
-    @Override
-    public BitMatrix encode(String contents, BarcodeFormat format, int width, int height,
-            Hashtable<?, ?> hints) throws WriterException {
-        if (format != BarcodeFormat.EAN_13) {
-            throw new IllegalArgumentException("Can only encode EAN_13, but got " + format);
-        }
-
-        return super.encode(contents, format, width, height, hints);
-    }
 
     @Override
     public byte[] encode(String contents) {
@@ -60,7 +49,8 @@ public final class EAN13Writer extends UPCEANWriter {
 
         pos += appendPattern(result, pos, UPCEANReader.START_END_PATTERN, 1);
 
-        // See {@link #EAN13Reader} for a description of how the first digit & left bars are encoded
+        // See {@link #EAN13Reader} for a description of how the first digit &
+        // left bars are encoded
         for (int i = 1; i <= 6; i++) {
             int digit = Integer.parseInt(contents.substring(i, i + 1));
             if ((parities >> (6 - i) & 1) == 1) {
@@ -78,6 +68,16 @@ public final class EAN13Writer extends UPCEANWriter {
         pos += appendPattern(result, pos, UPCEANReader.START_END_PATTERN, 1);
 
         return result;
+    }
+
+    @Override
+    public BitMatrix encode(String contents, BarcodeFormat format, int width, int height,
+            Hashtable<?, ?> hints) throws WriterException {
+        if (format != BarcodeFormat.EAN_13) {
+            throw new IllegalArgumentException("Can only encode EAN_13, but got " + format);
+        }
+
+        return super.encode(contents, format, width, height, hints);
     }
 
 }

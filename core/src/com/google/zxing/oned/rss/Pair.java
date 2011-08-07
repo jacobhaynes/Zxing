@@ -19,6 +19,7 @@ package com.google.zxing.oned.rss;
 final class Pair extends DataCharacter {
 
     private final FinderPattern finderPattern;
+
     private int count;
 
     Pair(int value, int checksumPortion, FinderPattern finderPattern) {
@@ -26,12 +27,12 @@ final class Pair extends DataCharacter {
         this.finderPattern = finderPattern;
     }
 
-    FinderPattern getFinderPattern() {
-        return finderPattern;
-    }
-
     int getCount() {
         return count;
+    }
+
+    FinderPattern getFinderPattern() {
+        return finderPattern;
     }
 
     void incrementCount() {

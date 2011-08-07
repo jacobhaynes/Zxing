@@ -25,6 +25,7 @@ package com.google.zxing.client.result;
 public final class TextParsedResult extends ParsedResult {
 
     private final String text;
+
     private final String language;
 
     public TextParsedResult(String text, String language) {
@@ -33,7 +34,8 @@ public final class TextParsedResult extends ParsedResult {
         this.language = language;
     }
 
-    public String getText() {
+    @Override
+    public String getDisplayResult() {
         return text;
     }
 
@@ -41,8 +43,7 @@ public final class TextParsedResult extends ParsedResult {
         return language;
     }
 
-    @Override
-    public String getDisplayResult() {
+    public String getText() {
         return text;
     }
 

@@ -21,38 +21,13 @@ import com.google.zxing.oned.OneDReader;
 
 public abstract class AbstractRSSReader extends OneDReader {
 
-    private static final int MAX_AVG_VARIANCE = (int) (PATTERN_MATCH_RESULT_SCALE_FACTOR * 0.2f);
-    private static final int MAX_INDIVIDUAL_VARIANCE = (int) (PATTERN_MATCH_RESULT_SCALE_FACTOR * 0.4f);
+    private static final int MAX_AVG_VARIANCE = (int)(PATTERN_MATCH_RESULT_SCALE_FACTOR * 0.2f);
+
+    private static final int MAX_INDIVIDUAL_VARIANCE = (int)(PATTERN_MATCH_RESULT_SCALE_FACTOR * 0.4f);
 
     private static final float MIN_FINDER_PATTERN_RATIO = 9.5f / 12.0f;
+
     private static final float MAX_FINDER_PATTERN_RATIO = 12.5f / 14.0f;
-
-    protected final int[] decodeFinderCounters;
-    protected final int[] dataCharacterCounters;
-    protected final float[] oddRoundingErrors;
-    protected final float[] evenRoundingErrors;
-    protected final int[] oddCounts;
-    protected final int[] evenCounts;
-
-    protected AbstractRSSReader(){
-        decodeFinderCounters = new int[4];
-        dataCharacterCounters = new int[8];
-        oddRoundingErrors = new float[4];
-        evenRoundingErrors = new float[4];
-        oddCounts = new int[dataCharacterCounters.length / 2];
-        evenCounts = new int[dataCharacterCounters.length / 2];
-    }
-
-
-    protected static int parseFinderValue(int[] counters, int [][] finderPatterns) throws NotFoundException {
-        for (int value = 0; value < finderPatterns.length; value++) {
-            if (patternMatchVariance(counters, finderPatterns[value], MAX_INDIVIDUAL_VARIANCE) <
-                    MAX_AVG_VARIANCE) {
-                return value;
-            }
-        }
-        throw NotFoundException.getNotFoundInstance();
-    }
 
     protected static int count(int[] array) {
         int count = 0;
@@ -60,18 +35,6 @@ public abstract class AbstractRSSReader extends OneDReader {
             count += array[i];
         }
         return count;
-    }
-
-    protected static void increment(int[] array, float[] errors) {
-        int index = 0;
-        float biggestError = errors[0];
-        for (int i = 1; i < array.length; i++) {
-            if (errors[i] > biggestError) {
-                biggestError = errors[i];
-                index = i;
-            }
-        }
-        array[index]++;
     }
 
     protected static void decrement(int[] array, float[] errors) {
@@ -86,10 +49,22 @@ public abstract class AbstractRSSReader extends OneDReader {
         array[index]--;
     }
 
+    protected static void increment(int[] array, float[] errors) {
+        int index = 0;
+        float biggestError = errors[0];
+        for (int i = 1; i < array.length; i++) {
+            if (errors[i] > biggestError) {
+                biggestError = errors[i];
+                index = i;
+            }
+        }
+        array[index]++;
+    }
+
     protected static boolean isFinderPattern(int[] counters) {
         int firstTwoSum = counters[0] + counters[1];
         int sum = firstTwoSum + counters[2] + counters[3];
-        float ratio = (float) firstTwoSum / (float) sum;
+        float ratio = (float)firstTwoSum / (float)sum;
         if (ratio >= MIN_FINDER_PATTERN_RATIO && ratio <= MAX_FINDER_PATTERN_RATIO) {
             // passes ratio test in spec, but see if the counts are unreasonable
             int minCounter = Integer.MAX_VALUE;
@@ -106,5 +81,36 @@ public abstract class AbstractRSSReader extends OneDReader {
             return maxCounter < 10 * minCounter;
         }
         return false;
+    }
+
+    protected static int parseFinderValue(int[] counters, int[][] finderPatterns)
+            throws NotFoundException {
+        for (int value = 0; value < finderPatterns.length; value++) {
+            if (patternMatchVariance(counters, finderPatterns[value], MAX_INDIVIDUAL_VARIANCE) < MAX_AVG_VARIANCE) {
+                return value;
+            }
+        }
+        throw NotFoundException.getNotFoundInstance();
+    }
+
+    protected final int[] decodeFinderCounters;
+
+    protected final int[] dataCharacterCounters;
+
+    protected final float[] oddRoundingErrors;
+
+    protected final float[] evenRoundingErrors;
+
+    protected final int[] oddCounts;
+
+    protected final int[] evenCounts;
+
+    protected AbstractRSSReader() {
+        decodeFinderCounters = new int[4];
+        dataCharacterCounters = new int[8];
+        oddRoundingErrors = new float[4];
+        evenRoundingErrors = new float[4];
+        oddCounts = new int[dataCharacterCounters.length / 2];
+        evenCounts = new int[dataCharacterCounters.length / 2];
     }
 }

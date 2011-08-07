@@ -19,14 +19,17 @@ package com.google.zxing.client.result.optional;
 import com.google.zxing.Result;
 
 /**
- * <p>Recognizes an NDEF message that encodes information according to the
- * "Smart Poster Record Type Definition" specification.</p>
- *
- * <p>This actually only supports some parts of the Smart Poster format: title,
- * URI, and action records. Icon records are not supported because the size
- * of these records are infeasibly large for barcodes. Size and type records
- * are not supported. Multiple titles are not supported.</p>
- *
+ * <p>
+ * Recognizes an NDEF message that encodes information according to the
+ * "Smart Poster Record Type Definition" specification.
+ * </p>
+ * <p>
+ * This actually only supports some parts of the Smart Poster format: title,
+ * URI, and action records. Icon records are not supported because the size of
+ * these records are infeasibly large for barcodes. Size and type records are
+ * not supported. Multiple titles are not supported.
+ * </p>
+ * 
  * @author Sean Owen
  */
 final class NDEFSmartPosterResultParser extends AbstractNDEFResultParser {
@@ -53,14 +56,16 @@ final class NDEFSmartPosterResultParser extends AbstractNDEFResultParser {
         String title = null;
         String uri = null;
 
-        while (offset < payload.length && (ndefRecord = NDEFRecord.readRecord(payload, offset)) != null) {
+        while (offset < payload.length
+                && (ndefRecord = NDEFRecord.readRecord(payload, offset)) != null) {
             if (recordNumber == 0 && !ndefRecord.isMessageBegin()) {
                 return null;
             }
 
             String type = ndefRecord.getType();
             if (NDEFRecord.TEXT_WELL_KNOWN_TYPE.equals(type)) {
-                String[] languageText = NDEFTextResultParser.decodeTextPayload(ndefRecord.getPayload());
+                String[] languageText = NDEFTextResultParser.decodeTextPayload(ndefRecord
+                        .getPayload());
                 title = languageText[1];
             } else if (NDEFRecord.URI_WELL_KNOWN_TYPE.equals(type)) {
                 uri = NDEFURIResultParser.decodeURIPayload(ndefRecord.getPayload());

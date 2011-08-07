@@ -20,13 +20,10 @@ import com.google.zxing.Result;
 
 /**
  * Parses a "tel:" URI result, which specifies a phone number.
- *
+ * 
  * @author Sean Owen
  */
 final class TelResultParser extends ResultParser {
-
-    private TelResultParser() {
-    }
 
     public static TelParsedResult parse(Result result) {
         String rawText = result.getText();
@@ -39,6 +36,9 @@ final class TelResultParser extends ResultParser {
         int queryStart = rawText.indexOf('?', 4);
         String number = queryStart < 0 ? rawText.substring(4) : rawText.substring(4, queryStart);
         return new TelParsedResult(number, telURI, null);
+    }
+
+    private TelResultParser() {
     }
 
 }

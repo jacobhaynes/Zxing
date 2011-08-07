@@ -19,14 +19,17 @@ package com.google.zxing.common.reedsolomon;
 import java.util.Vector;
 
 /**
- * <p>Implements Reed-Solomon enbcoding, as the name implies.</p>
- *
+ * <p>
+ * Implements Reed-Solomon enbcoding, as the name implies.
+ * </p>
+ * 
  * @author Sean Owen
  * @author William Rucklidge
  */
 public final class ReedSolomonEncoder {
 
     private final GenericGF field;
+
     private final Vector<GenericGFPoly> cachedGenerators;
 
     public ReedSolomonEncoder(GenericGF field) {
@@ -35,14 +38,19 @@ public final class ReedSolomonEncoder {
         }
         this.field = field;
         this.cachedGenerators = new Vector<GenericGFPoly>();
-        cachedGenerators.addElement(new GenericGFPoly(field, new int[] { 1 }));
+        cachedGenerators.addElement(new GenericGFPoly(field, new int[] {
+            1
+        }));
     }
 
     private GenericGFPoly buildGenerator(int degree) {
         if (degree >= cachedGenerators.size()) {
             GenericGFPoly lastGenerator = cachedGenerators.elementAt(cachedGenerators.size() - 1);
             for (int d = cachedGenerators.size(); d <= degree; d++) {
-                GenericGFPoly nextGenerator = lastGenerator.multiply(new GenericGFPoly(field, new int[] { 1, field.exp(d - 1) }));
+                GenericGFPoly nextGenerator = lastGenerator.multiply(new GenericGFPoly(field,
+                        new int[] {
+                                1, field.exp(d - 1)
+                        }));
                 cachedGenerators.addElement(nextGenerator);
                 lastGenerator = nextGenerator;
             }
@@ -69,7 +77,8 @@ public final class ReedSolomonEncoder {
         for (int i = 0; i < numZeroCoefficients; i++) {
             toEncode[dataBytes + i] = 0;
         }
-        System.arraycopy(coefficients, 0, toEncode, dataBytes + numZeroCoefficients, coefficients.length);
+        System.arraycopy(coefficients, 0, toEncode, dataBytes + numZeroCoefficients,
+                coefficients.length);
     }
 
 }

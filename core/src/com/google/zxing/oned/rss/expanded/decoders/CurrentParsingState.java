@@ -32,38 +32,41 @@ package com.google.zxing.oned.rss.expanded.decoders;
 final class CurrentParsingState {
 
     int position;
+
     private int encoding;
 
-    private static final int NUMERIC     = 1;
-    private static final int ALPHA       = 2;
+    private static final int NUMERIC = 1;
+
+    private static final int ALPHA = 2;
+
     private static final int ISO_IEC_646 = 4;
 
-    CurrentParsingState(){
+    CurrentParsingState() {
         this.position = 0;
         this.encoding = NUMERIC;
     }
 
-    boolean isAlpha(){
+    boolean isAlpha() {
         return this.encoding == ALPHA;
     }
 
-    boolean isNumeric(){
-        return this.encoding == NUMERIC;
-    }
-
-    boolean isIsoIec646(){
+    boolean isIsoIec646() {
         return this.encoding == ISO_IEC_646;
     }
 
-    void setNumeric(){
-        this.encoding = NUMERIC;
+    boolean isNumeric() {
+        return this.encoding == NUMERIC;
     }
 
-    void setAlpha(){
+    void setAlpha() {
         this.encoding = ALPHA;
     }
 
-    void setIsoIec646(){
+    void setIsoIec646() {
         this.encoding = ISO_IEC_646;
+    }
+
+    void setNumeric() {
+        this.encoding = NUMERIC;
     }
 }

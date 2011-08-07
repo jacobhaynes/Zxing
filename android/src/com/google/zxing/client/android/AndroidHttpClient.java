@@ -16,6 +16,8 @@
 
 package com.google.zxing.client.android;
 
+import java.io.IOException;
+
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpRequestInterceptor;
@@ -39,142 +41,147 @@ import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
-import java.io.IOException;
-
 /**
- * <p>Subclass of the Apache {@link DefaultHttpClient} that is configured with
- * reasonable default settings and registered schemes for Android, and
- * also lets the user add {@link HttpRequestInterceptor} classes.
- * Don't create this directly, use the {@link #newInstance} factory method.</p>
+ * <p>
+ * Subclass of the Apache {@link DefaultHttpClient} that is configured with
+ * reasonable default settings and registered schemes for Android, and also lets
+ * the user add {@link HttpRequestInterceptor} classes. Don't create this
+ * directly, use the {@link #newInstance} factory method.
+ * </p>
  * <p/>
- * <p>This client processes cookies but does not retain them by default.
- * To retain cookies, simply add a cookie store to the HttpContext:
- * <pre>context.setAttribute(ClientContext.COOKIE_STORE, cookieStore);</pre>
+ * <p>
+ * This client processes cookies but does not retain them by default. To retain
+ * cookies, simply add a cookie store to the HttpContext:
+ * 
+ * <pre>
+ * context.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
+ * </pre>
+ * 
  * </p>
  */
 public final class AndroidHttpClient implements HttpClient {
 
-  /**
-   * Create a new HttpClient with reasonable defaults (which you can update).
-   *
-   * @param userAgent to report in your HTTP requests.
-   * @return AndroidHttpClient for you to use for all your requests.
-   */
-  public static AndroidHttpClient newInstance(String userAgent) {
-    HttpParams params = new BasicHttpParams();
+    private static class DelegateHttpClient extends DefaultHttpClient {
 
-    // Turn off stale checking.  Our connections break all the time anyway,
-    // and it's not worth it to pay the penalty of checking every time.
-    HttpConnectionParams.setStaleCheckingEnabled(params, false);
+        private DelegateHttpClient(ClientConnectionManager ccm, HttpParams params) {
+            super(ccm, params);
+        }
 
-    // Default connection and socket timeout of 20 seconds.  Tweak to taste.
-    HttpConnectionParams.setConnectionTimeout(params, 20 * 1000);
-    HttpConnectionParams.setSoTimeout(params, 20 * 1000);
-    HttpConnectionParams.setSocketBufferSize(params, 8192);
-
-    // Don't handle redirects -- return them to the caller.  Our code
-    // often wants to re-POST after a redirect, which we must do ourselves.
-    HttpClientParams.setRedirecting(params, false);
-
-    // Set the specified user agent and register standard protocols.
-    if (userAgent != null) {
-      HttpProtocolParams.setUserAgent(params, userAgent);
+        @Override
+        protected HttpContext createHttpContext() {
+            // Same as DefaultHttpClient.createHttpContext() minus the
+            // cookie store.
+            HttpContext context = new BasicHttpContext();
+            context.setAttribute(ClientContext.AUTHSCHEME_REGISTRY, getAuthSchemes());
+            context.setAttribute(ClientContext.COOKIESPEC_REGISTRY, getCookieSpecs());
+            context.setAttribute(ClientContext.CREDS_PROVIDER, getCredentialsProvider());
+            return context;
+        }
     }
-    SchemeRegistry schemeRegistry = new SchemeRegistry();
-    schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
-    schemeRegistry.register(new Scheme("https", SSLSocketFactory.getSocketFactory(), 443));
-    ClientConnectionManager manager = new ThreadSafeClientConnManager(params, schemeRegistry);
 
-    // We use a factory method to modify superclass initialization
-    // parameters without the funny call-a-static-method dance.
-    return new AndroidHttpClient(manager, params);
-  }
+    /**
+     * Create a new HttpClient with reasonable defaults (which you can update).
+     * 
+     * @param userAgent to report in your HTTP requests.
+     * @return AndroidHttpClient for you to use for all your requests.
+     */
+    public static AndroidHttpClient newInstance(String userAgent) {
+        HttpParams params = new BasicHttpParams();
 
-  private final HttpClient delegate;
+        // Turn off stale checking. Our connections break all the time anyway,
+        // and it's not worth it to pay the penalty of checking every time.
+        HttpConnectionParams.setStaleCheckingEnabled(params, false);
 
+        // Default connection and socket timeout of 20 seconds. Tweak to taste.
+        HttpConnectionParams.setConnectionTimeout(params, 20 * 1000);
+        HttpConnectionParams.setSoTimeout(params, 20 * 1000);
+        HttpConnectionParams.setSocketBufferSize(params, 8192);
 
-  private AndroidHttpClient(ClientConnectionManager ccm, HttpParams params) {
-    this.delegate = new DelegateHttpClient(ccm, params);
-  }
+        // Don't handle redirects -- return them to the caller. Our code
+        // often wants to re-POST after a redirect, which we must do ourselves.
+        HttpClientParams.setRedirecting(params, false);
 
-  /**
-   * Release resources associated with this client.  You must call this,
-   * or significant resources (sockets and memory) may be leaked.
-   */
-  public void close() {
-    getConnectionManager().shutdown();
-  }
+        // Set the specified user agent and register standard protocols.
+        if (userAgent != null) {
+            HttpProtocolParams.setUserAgent(params, userAgent);
+        }
+        SchemeRegistry schemeRegistry = new SchemeRegistry();
+        schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+        schemeRegistry.register(new Scheme("https", SSLSocketFactory.getSocketFactory(), 443));
+        ClientConnectionManager manager = new ThreadSafeClientConnManager(params, schemeRegistry);
 
-  @Override
-public HttpParams getParams() {
-    return delegate.getParams();
-  }
+        // We use a factory method to modify superclass initialization
+        // parameters without the funny call-a-static-method dance.
+        return new AndroidHttpClient(manager, params);
+    }
 
-  @Override
-public ClientConnectionManager getConnectionManager() {
-    return delegate.getConnectionManager();
-  }
+    private final HttpClient delegate;
 
-  @Override
-public HttpResponse execute(HttpUriRequest request) throws IOException {
-    return delegate.execute(request);
-  }
+    private AndroidHttpClient(ClientConnectionManager ccm, HttpParams params) {
+        this.delegate = new DelegateHttpClient(ccm, params);
+    }
 
-  @Override
-public HttpResponse execute(HttpUriRequest request, HttpContext context) throws IOException {
-    return delegate.execute(request, context);
-  }
-
-  @Override
-public HttpResponse execute(HttpHost target, HttpRequest request) throws IOException {
-    return delegate.execute(target, request);
-  }
-
-  @Override
-public HttpResponse execute(HttpHost target, HttpRequest request, HttpContext context) throws IOException {
-    return delegate.execute(target, request, context);
-  }
-
-  @Override
-public <T> T execute(HttpUriRequest request, ResponseHandler<? extends T> responseHandler) throws IOException {
-    return delegate.execute(request, responseHandler);
-  }
-
-  @Override
-public <T> T execute(HttpUriRequest request, ResponseHandler<? extends T> responseHandler, HttpContext context)
-      throws IOException {
-    return delegate.execute(request, responseHandler, context);
-  }
-
-  @Override
-public <T> T execute(HttpHost target, HttpRequest request, ResponseHandler<? extends T> responseHandler)
-      throws IOException {
-    return delegate.execute(target, request, responseHandler);
-  }
-
-  @Override
-public <T> T execute(HttpHost target, HttpRequest request,
-                       ResponseHandler<? extends T> responseHandler,
-                       HttpContext context) throws IOException {
-    return delegate.execute(target, request, responseHandler, context);
-  }
-
-  private static class DelegateHttpClient extends DefaultHttpClient {
-
-    private DelegateHttpClient(ClientConnectionManager ccm, HttpParams params) {
-      super(ccm, params);
+    /**
+     * Release resources associated with this client. You must call this, or
+     * significant resources (sockets and memory) may be leaked.
+     */
+    public void close() {
+        getConnectionManager().shutdown();
     }
 
     @Override
-    protected HttpContext createHttpContext() {
-      // Same as DefaultHttpClient.createHttpContext() minus the
-      // cookie store.
-      HttpContext context = new BasicHttpContext();
-      context.setAttribute(ClientContext.AUTHSCHEME_REGISTRY, getAuthSchemes());
-      context.setAttribute(ClientContext.COOKIESPEC_REGISTRY, getCookieSpecs());
-      context.setAttribute(ClientContext.CREDS_PROVIDER, getCredentialsProvider());
-      return context;
+    public HttpResponse execute(HttpHost target, HttpRequest request) throws IOException {
+        return delegate.execute(target, request);
     }
-  }
+
+    @Override
+    public HttpResponse execute(HttpHost target, HttpRequest request, HttpContext context)
+            throws IOException {
+        return delegate.execute(target, request, context);
+    }
+
+    @Override
+    public <T> T execute(HttpHost target, HttpRequest request,
+            ResponseHandler<? extends T> responseHandler) throws IOException {
+        return delegate.execute(target, request, responseHandler);
+    }
+
+    @Override
+    public <T> T execute(HttpHost target, HttpRequest request,
+            ResponseHandler<? extends T> responseHandler, HttpContext context) throws IOException {
+        return delegate.execute(target, request, responseHandler, context);
+    }
+
+    @Override
+    public HttpResponse execute(HttpUriRequest request) throws IOException {
+        return delegate.execute(request);
+    }
+
+    @Override
+    public HttpResponse execute(HttpUriRequest request, HttpContext context) throws IOException {
+        return delegate.execute(request, context);
+    }
+
+    @Override
+    public <T> T execute(HttpUriRequest request, ResponseHandler<? extends T> responseHandler)
+            throws IOException {
+        return delegate.execute(request, responseHandler);
+    }
+
+    @Override
+    public <T> T execute(HttpUriRequest request, ResponseHandler<? extends T> responseHandler,
+            HttpContext context) throws IOException {
+        return delegate.execute(request, responseHandler, context);
+    }
+
+    @Override
+    public ClientConnectionManager getConnectionManager() {
+        return delegate.getConnectionManager();
+    }
+
+    @Override
+    public HttpParams getParams() {
+        return delegate.getParams();
+    }
 
 }

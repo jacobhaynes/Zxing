@@ -16,33 +16,36 @@
 
 package com.google.zxing;
 
+import java.util.Hashtable;
+import java.util.Vector;
+
 import com.google.zxing.aztec.AztecReader;
 import com.google.zxing.datamatrix.DataMatrixReader;
 import com.google.zxing.oned.MultiFormatOneDReader;
 import com.google.zxing.pdf417.PDF417Reader;
 import com.google.zxing.qrcode.QRCodeReader;
 
-import java.util.Hashtable;
-import java.util.Vector;
-
 /**
- * MultiFormatReader is a convenience class and the main entry point into the library for most uses.
- * By default it attempts to decode all barcode formats that the library supports. Optionally, you
- * can provide a hints object to request different behavior, for example only decoding QR codes.
- *
+ * MultiFormatReader is a convenience class and the main entry point into the
+ * library for most uses. By default it attempts to decode all barcode formats
+ * that the library supports. Optionally, you can provide a hints object to
+ * request different behavior, for example only decoding QR codes.
+ * 
  * @author Sean Owen
  * @author dswitkin@google.com (Daniel Switkin)
  */
 public final class MultiFormatReader implements Reader {
 
     private Hashtable<?, ?> hints;
+
     private Vector<Reader> readers;
 
     /**
-     * This version of decode honors the intent of Reader.decode(BinaryBitmap) in that it
-     * passes null as a hint to the decoders. However, that makes it inefficient to call repeatedly.
-     * Use setHints() followed by decodeWithState() for continuous scan applications.
-     *
+     * This version of decode honors the intent of Reader.decode(BinaryBitmap)
+     * in that it passes null as a hint to the decoders. However, that makes it
+     * inefficient to call repeatedly. Use setHints() followed by
+     * decodeWithState() for continuous scan applications.
+     * 
      * @param image The pixel data to decode
      * @return The contents of the image
      * @throws NotFoundException Any errors which occurred
@@ -55,7 +58,7 @@ public final class MultiFormatReader implements Reader {
 
     /**
      * Decode an image using the hints provided. Does not honor existing state.
-     *
+     * 
      * @param image The pixel data to decode
      * @param hints The hints to use, clearing the previous state.
      * @return The contents of the image
@@ -67,10 +70,25 @@ public final class MultiFormatReader implements Reader {
         return decodeInternal(image);
     }
 
+    private Result decodeInternal(BinaryBitmap image) throws NotFoundException {
+        int size = readers.size();
+        for (int i = 0; i < size; i++) {
+            Reader reader = readers.elementAt(i);
+            try {
+                return reader.decode(image, hints);
+            } catch (ReaderException re) {
+                // continue
+            }
+        }
+
+        throw NotFoundException.getNotFoundInstance();
+    }
+
     /**
-     * Decode an image using the state set up by calling setHints() previously. Continuous scan
-     * clients will get a <b>large</b> speed increase by using this instead of decode().
-     *
+     * Decode an image using the state set up by calling setHints() previously.
+     * Continuous scan clients will get a <b>large</b> speed increase by using
+     * this instead of decode().
+     * 
      * @param image The pixel data to decode
      * @return The contents of the image
      * @throws NotFoundException Any errors which occurred
@@ -83,32 +101,44 @@ public final class MultiFormatReader implements Reader {
         return decodeInternal(image);
     }
 
+    @Override
+    public void reset() {
+        int size = readers.size();
+        for (int i = 0; i < size; i++) {
+            Reader reader = readers.elementAt(i);
+            reader.reset();
+        }
+    }
+
     /**
-     * This method adds state to the MultiFormatReader. By setting the hints once, subsequent calls
-     * to decodeWithState(image) can reuse the same set of readers without reallocating memory. This
-     * is important for performance in continuous scan clients.
-     *
-     * @param hints The set of hints to use for subsequent calls to decode(image)
+     * This method adds state to the MultiFormatReader. By setting the hints
+     * once, subsequent calls to decodeWithState(image) can reuse the same set
+     * of readers without reallocating memory. This is important for performance
+     * in continuous scan clients.
+     * 
+     * @param hints The set of hints to use for subsequent calls to
+     *            decode(image)
      */
     public void setHints(Hashtable<?, ?> hints) {
         this.hints = hints;
 
         boolean tryHarder = hints != null && hints.containsKey(DecodeHintType.TRY_HARDER);
-        Vector<?> formats = hints == null ? null : (Vector<?>) hints.get(DecodeHintType.POSSIBLE_FORMATS);
+        Vector<?> formats = hints == null ? null : (Vector<?>)hints
+                .get(DecodeHintType.POSSIBLE_FORMATS);
         readers = new Vector<Reader>();
         if (formats != null) {
-            boolean addOneDReader =
-                    formats.contains(BarcodeFormat.UPC_A) ||
-                    formats.contains(BarcodeFormat.UPC_E) ||
-                    formats.contains(BarcodeFormat.EAN_13) ||
-                    formats.contains(BarcodeFormat.EAN_8) ||
-                    //formats.contains(BarcodeFormat.CODABAR) ||
-                    formats.contains(BarcodeFormat.CODE_39) ||
-                    formats.contains(BarcodeFormat.CODE_93) ||
-                    formats.contains(BarcodeFormat.CODE_128) ||
-                    formats.contains(BarcodeFormat.ITF) ||
-                    formats.contains(BarcodeFormat.RSS_14) ||
-                    formats.contains(BarcodeFormat.RSS_EXPANDED);
+            boolean addOneDReader = formats.contains(BarcodeFormat.UPC_A)
+                    || formats.contains(BarcodeFormat.UPC_E)
+                    || formats.contains(BarcodeFormat.EAN_13)
+                    || formats.contains(BarcodeFormat.EAN_8)
+                    ||
+                    // formats.contains(BarcodeFormat.CODABAR) ||
+                    formats.contains(BarcodeFormat.CODE_39)
+                    || formats.contains(BarcodeFormat.CODE_93)
+                    || formats.contains(BarcodeFormat.CODE_128)
+                    || formats.contains(BarcodeFormat.ITF)
+                    || formats.contains(BarcodeFormat.RSS_14)
+                    || formats.contains(BarcodeFormat.RSS_EXPANDED);
             // Put 1D readers upfront in "normal" mode
             if (addOneDReader && !tryHarder) {
                 readers.addElement(new MultiFormatOneDReader(hints));
@@ -144,29 +174,6 @@ public final class MultiFormatReader implements Reader {
                 readers.addElement(new MultiFormatOneDReader(hints));
             }
         }
-    }
-
-    @Override
-    public void reset() {
-        int size = readers.size();
-        for (int i = 0; i < size; i++) {
-            Reader reader = readers.elementAt(i);
-            reader.reset();
-        }
-    }
-
-    private Result decodeInternal(BinaryBitmap image) throws NotFoundException {
-        int size = readers.size();
-        for (int i = 0; i < size; i++) {
-            Reader reader = readers.elementAt(i);
-            try {
-                return reader.decode(image, hints);
-            } catch (ReaderException re) {
-                // continue
-            }
-        }
-
-        throw NotFoundException.getNotFoundInstance();
     }
 
 }

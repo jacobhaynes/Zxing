@@ -16,6 +16,9 @@
 
 package com.google.zxing.multi;
 
+import java.util.Hashtable;
+import java.util.Vector;
+
 import com.google.zxing.BinaryBitmap;
 import com.google.zxing.NotFoundException;
 import com.google.zxing.Reader;
@@ -23,26 +26,40 @@ import com.google.zxing.ReaderException;
 import com.google.zxing.Result;
 import com.google.zxing.ResultPoint;
 
-import java.util.Hashtable;
-import java.util.Vector;
-
 /**
- * <p>Attempts to locate multiple barcodes in an image by repeatedly decoding portion of the image.
- * After one barcode is found, the areas left, above, right and below the barcode's
- * {@link com.google.zxing.ResultPoint}s are scanned, recursively.</p>
- *
- * <p>A caller may want to also employ {@link ByQuadrantReader} when attempting to find multiple
- * 2D barcodes, like QR Codes, in an image, where the presence of multiple barcodes might prevent
- * detecting any one of them.</p>
- *
- * <p>That is, instead of passing a {@link Reader} a caller might pass
- * <code>new ByQuadrantReader(reader)</code>.</p>
- *
+ * <p>
+ * Attempts to locate multiple barcodes in an image by repeatedly decoding
+ * portion of the image. After one barcode is found, the areas left, above,
+ * right and below the barcode's {@link com.google.zxing.ResultPoint}s are
+ * scanned, recursively.
+ * </p>
+ * <p>
+ * A caller may want to also employ {@link ByQuadrantReader} when attempting to
+ * find multiple 2D barcodes, like QR Codes, in an image, where the presence of
+ * multiple barcodes might prevent detecting any one of them.
+ * </p>
+ * <p>
+ * That is, instead of passing a {@link Reader} a caller might pass
+ * <code>new ByQuadrantReader(reader)</code>.
+ * </p>
+ * 
  * @author Sean Owen
  */
 public final class GenericMultipleBarcodeReader implements MultipleBarcodeReader {
 
     private static final int MIN_DIMENSION_TO_RECUR = 100;
+
+    private static Result translateResultPoints(Result result, int xOffset, int yOffset) {
+        ResultPoint[] oldResultPoints = result.getResultPoints();
+        ResultPoint[] newResultPoints = new ResultPoint[oldResultPoints.length];
+        for (int i = 0; i < oldResultPoints.length; i++) {
+            ResultPoint oldPoint = oldResultPoints[i];
+            newResultPoints[i] = new ResultPoint(oldPoint.getX() + xOffset, oldPoint.getY()
+                    + yOffset);
+        }
+        return new Result(result.getText(), result.getRawBytes(), newResultPoints,
+                result.getBarcodeFormat());
+    }
 
     private final Reader delegate;
 
@@ -71,11 +88,8 @@ public final class GenericMultipleBarcodeReader implements MultipleBarcodeReader
         return resultArray;
     }
 
-    private void doDecodeMultiple(BinaryBitmap image,
-            Hashtable<?, ?> hints,
-            Vector<Result> results,
-            int xOffset,
-            int yOffset) {
+    private void doDecodeMultiple(BinaryBitmap image, Hashtable<?, ?> hints,
+            Vector<Result> results, int xOffset, int yOffset) {
         Result result;
         try {
             result = delegate.decode(image, hints);
@@ -124,35 +138,22 @@ public final class GenericMultipleBarcodeReader implements MultipleBarcodeReader
 
         // Decode left of barcode
         if (minX > MIN_DIMENSION_TO_RECUR) {
-            doDecodeMultiple(image.crop(0, 0, (int) minX, height),
-                    hints, results, xOffset, yOffset);
+            doDecodeMultiple(image.crop(0, 0, (int)minX, height), hints, results, xOffset, yOffset);
         }
         // Decode above barcode
         if (minY > MIN_DIMENSION_TO_RECUR) {
-            doDecodeMultiple(image.crop(0, 0, width, (int) minY),
-                    hints, results, xOffset, yOffset);
+            doDecodeMultiple(image.crop(0, 0, width, (int)minY), hints, results, xOffset, yOffset);
         }
         // Decode right of barcode
         if (maxX < width - MIN_DIMENSION_TO_RECUR) {
-            doDecodeMultiple(image.crop((int) maxX, 0, width - (int) maxX, height),
-                    hints, results, xOffset + (int) maxX, yOffset);
+            doDecodeMultiple(image.crop((int)maxX, 0, width - (int)maxX, height), hints, results,
+                    xOffset + (int)maxX, yOffset);
         }
         // Decode below barcode
         if (maxY < height - MIN_DIMENSION_TO_RECUR) {
-            doDecodeMultiple(image.crop(0, (int) maxY, width, height - (int) maxY),
-                    hints, results, xOffset, yOffset + (int) maxY);
+            doDecodeMultiple(image.crop(0, (int)maxY, width, height - (int)maxY), hints, results,
+                    xOffset, yOffset + (int)maxY);
         }
-    }
-
-    private static Result translateResultPoints(Result result, int xOffset, int yOffset) {
-        ResultPoint[] oldResultPoints = result.getResultPoints();
-        ResultPoint[] newResultPoints = new ResultPoint[oldResultPoints.length];
-        for (int i = 0; i < oldResultPoints.length; i++) {
-            ResultPoint oldPoint = oldResultPoints[i];
-            newResultPoints[i] = new ResultPoint(oldPoint.getX() + xOffset, oldPoint.getY() + yOffset);
-        }
-        return new Result(result.getText(), result.getRawBytes(), newResultPoints,
-                result.getBarcodeFormat());
     }
 
 }

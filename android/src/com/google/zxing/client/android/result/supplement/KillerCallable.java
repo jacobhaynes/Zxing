@@ -24,24 +24,26 @@ import java.util.concurrent.TimeoutException;
 
 final class KillerCallable implements Callable<Void> {
 
-  private final Future<?> future;
-  private final long timeout;
-  private final TimeUnit unit;
+    private final Future<?> future;
 
-  KillerCallable(Future<?> future, long timeout, TimeUnit unit) {
-    this.future = future;
-    this.timeout = timeout;
-    this.unit = unit;
-  }
+    private final long timeout;
 
-  @Override
-public Void call() throws ExecutionException, InterruptedException {
-    try {
-      future.get(timeout, unit);
-    } catch (TimeoutException te) {
-      future.cancel(true);
+    private final TimeUnit unit;
+
+    KillerCallable(Future<?> future, long timeout, TimeUnit unit) {
+        this.future = future;
+        this.timeout = timeout;
+        this.unit = unit;
     }
-    return null;
-  }
+
+    @Override
+    public Void call() throws ExecutionException, InterruptedException {
+        try {
+            future.get(timeout, unit);
+        } catch (TimeoutException te) {
+            future.cancel(true);
+        }
+        return null;
+    }
 
 }

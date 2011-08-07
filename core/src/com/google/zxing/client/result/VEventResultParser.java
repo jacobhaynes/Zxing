@@ -20,14 +20,12 @@ import com.google.zxing.Result;
 
 /**
  * Partially implements the iCalendar format's "VEVENT" format for specifying a
- * calendar event. See RFC 2445. This supports SUMMARY, LOCATION, GEO, DTSTART and DTEND fields.
- *
+ * calendar event. See RFC 2445. This supports SUMMARY, LOCATION, GEO, DTSTART
+ * and DTEND fields.
+ * 
  * @author Sean Owen
  */
 final class VEventResultParser extends ResultParser {
-
-    private VEventResultParser() {
-    }
 
     public static CalendarParsedResult parse(Result result) {
         String rawText = result.getText();
@@ -42,8 +40,10 @@ final class VEventResultParser extends ResultParser {
         String summary = VCardResultParser.matchSingleVCardPrefixedField("SUMMARY", rawText, true);
         String start = VCardResultParser.matchSingleVCardPrefixedField("DTSTART", rawText, true);
         String end = VCardResultParser.matchSingleVCardPrefixedField("DTEND", rawText, true);
-        String location = VCardResultParser.matchSingleVCardPrefixedField("LOCATION", rawText, true);
-        String description = VCardResultParser.matchSingleVCardPrefixedField("DESCRIPTION", rawText, true);
+        String location = VCardResultParser
+                .matchSingleVCardPrefixedField("LOCATION", rawText, true);
+        String description = VCardResultParser.matchSingleVCardPrefixedField("DESCRIPTION",
+                rawText, true);
 
         String geoString = VCardResultParser.matchSingleVCardPrefixedField("GEO", rawText, true);
         double latitude;
@@ -62,10 +62,14 @@ final class VEventResultParser extends ResultParser {
         }
 
         try {
-            return new CalendarParsedResult(summary, start, end, location, null, description, latitude, longitude);
+            return new CalendarParsedResult(summary, start, end, location, null, description,
+                    latitude, longitude);
         } catch (IllegalArgumentException iae) {
             return null;
         }
+    }
+
+    private VEventResultParser() {
     }
 
 }

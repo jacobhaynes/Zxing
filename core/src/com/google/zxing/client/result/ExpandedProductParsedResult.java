@@ -35,21 +35,35 @@ import java.util.Hashtable;
 public class ExpandedProductParsedResult extends ParsedResult {
 
     public static final String KILOGRAM = "KG";
+
     public static final String POUND = "LB";
 
     private final String productID;
+
     private final String sscc;
+
     private final String lotNumber;
+
     private final String productionDate;
+
     private final String packagingDate;
+
     private final String bestBeforeDate;
+
     private final String expirationDate;
+
     private final String weight;
+
     private final String weightType;
+
     private final String weightIncrement;
+
     private final String price;
+
     private final String priceIncrement;
+
     private final String priceCurrency;
+
     // For AIS that not exist in this object
     private final Hashtable<?, ?> uncommonAIs;
 
@@ -71,11 +85,10 @@ public class ExpandedProductParsedResult extends ParsedResult {
         this.uncommonAIs = new Hashtable<Object, Object>();
     }
 
-    public ExpandedProductParsedResult(String productID, String sscc,
-            String lotNumber, String productionDate, String packagingDate,
-            String bestBeforeDate, String expirationDate, String weight,
-            String weightType, String weightIncrement, String price,
-            String priceIncrement, String priceCurrency, Hashtable<?, ?> uncommonAIs) {
+    public ExpandedProductParsedResult(String productID, String sscc, String lotNumber,
+            String productionDate, String packagingDate, String bestBeforeDate,
+            String expirationDate, String weight, String weightType, String weightIncrement,
+            String price, String priceIncrement, String priceCurrency, Hashtable<?, ?> uncommonAIs) {
         super(ParsedResultType.PRODUCT);
         this.productID = productID;
         this.sscc = sscc;
@@ -94,30 +107,89 @@ public class ExpandedProductParsedResult extends ParsedResult {
     }
 
     @Override
-    public boolean equals(Object o){
+    public boolean equals(Object o) {
         if (!(o instanceof ExpandedProductParsedResult)) {
             return false;
         }
 
         ExpandedProductParsedResult other = (ExpandedProductParsedResult)o;
 
-        return this.productID.equals(       other.productID)
-                && this.sscc.equals(            other.sscc)
-                && this.lotNumber.equals(       other.lotNumber)
-                && this.productionDate.equals(  other.productionDate)
-                && this.bestBeforeDate.equals(  other.bestBeforeDate)
-                && this.expirationDate.equals(  other.expirationDate)
-                && this.weight.equals(          other.weight)
-                && this.weightType.equals(      other.weightType)
-                && this.weightIncrement.equals( other.weightIncrement)
-                && this.price.equals(           other.price)
-                && this.priceIncrement.equals(  other.priceIncrement)
-                && this.priceCurrency.equals(   other.priceCurrency)
-                && this.uncommonAIs.equals(     other.uncommonAIs);
+        return this.productID.equals(other.productID) && this.sscc.equals(other.sscc)
+                && this.lotNumber.equals(other.lotNumber)
+                && this.productionDate.equals(other.productionDate)
+                && this.bestBeforeDate.equals(other.bestBeforeDate)
+                && this.expirationDate.equals(other.expirationDate)
+                && this.weight.equals(other.weight) && this.weightType.equals(other.weightType)
+                && this.weightIncrement.equals(other.weightIncrement)
+                && this.price.equals(other.price)
+                && this.priceIncrement.equals(other.priceIncrement)
+                && this.priceCurrency.equals(other.priceCurrency)
+                && this.uncommonAIs.equals(other.uncommonAIs);
+    }
+
+    public String getBestBeforeDate() {
+        return bestBeforeDate;
     }
 
     @Override
-    public int hashCode(){
+    public String getDisplayResult() {
+        return productID;
+    }
+
+    public String getExpirationDate() {
+        return expirationDate;
+    }
+
+    public String getLotNumber() {
+        return lotNumber;
+    }
+
+    public String getPackagingDate() {
+        return packagingDate;
+    }
+
+    public String getPrice() {
+        return price;
+    }
+
+    public String getPriceCurrency() {
+        return priceCurrency;
+    }
+
+    public String getPriceIncrement() {
+        return priceIncrement;
+    }
+
+    public String getProductID() {
+        return productID;
+    }
+
+    public String getProductionDate() {
+        return productionDate;
+    }
+
+    public String getSscc() {
+        return sscc;
+    }
+
+    public Hashtable<?, ?> getUncommonAIs() {
+        return uncommonAIs;
+    }
+
+    public String getWeight() {
+        return weight;
+    }
+
+    public String getWeightIncrement() {
+        return weightIncrement;
+    }
+
+    public String getWeightType() {
+        return weightType;
+    }
+
+    @Override
+    public int hashCode() {
         int hash1 = this.productID.hashCode();
         hash1 = 31 * hash1 + this.sscc.hashCode();
         hash1 = 31 * hash1 + this.lotNumber.hashCode();
@@ -133,66 +205,5 @@ public class ExpandedProductParsedResult extends ParsedResult {
         hash2 = 31 * hash2 + this.priceCurrency.hashCode();
         hash2 = 31 * hash2 + this.uncommonAIs.hashCode();
         return hash1 ^ hash2;
-    }
-
-    public String getProductID() {
-        return productID;
-    }
-
-    public String getSscc() {
-        return sscc;
-    }
-
-    public String getLotNumber() {
-        return lotNumber;
-    }
-
-    public String getProductionDate() {
-        return productionDate;
-    }
-
-    public String getPackagingDate() {
-        return packagingDate;
-    }
-
-    public String getBestBeforeDate() {
-        return bestBeforeDate;
-    }
-
-    public String getExpirationDate() {
-        return expirationDate;
-    }
-
-    public String getWeight() {
-        return weight;
-    }
-
-    public String getWeightType() {
-        return weightType;
-    }
-
-    public String getWeightIncrement() {
-        return weightIncrement;
-    }
-
-    public String getPrice() {
-        return price;
-    }
-
-    public String getPriceIncrement() {
-        return priceIncrement;
-    }
-
-    public String getPriceCurrency() {
-        return priceCurrency;
-    }
-
-    public Hashtable<?, ?> getUncommonAIs() {
-        return uncommonAIs;
-    }
-
-    @Override
-    public String getDisplayResult() {
-        return productID;
     }
 }

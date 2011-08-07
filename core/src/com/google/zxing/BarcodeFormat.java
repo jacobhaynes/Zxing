@@ -20,7 +20,7 @@ import java.util.Hashtable;
 
 /**
  * Enumerates barcode formats known to this package. Please keep alphabetized.
- *
+ * 
  * @author Sean Owen
  */
 public final class BarcodeFormat {
@@ -77,6 +77,17 @@ public final class BarcodeFormat {
     /** UPC/EAN extension format. Not a stand-alone format. */
     public static final BarcodeFormat UPC_EAN_EXTENSION = new BarcodeFormat("UPC_EAN_EXTENSION");
 
+    public static BarcodeFormat valueOf(String name) {
+        if (name == null || name.length() == 0) {
+            throw new IllegalArgumentException();
+        }
+        BarcodeFormat format = VALUES.get(name);
+        if (format == null) {
+            throw new IllegalArgumentException();
+        }
+        return format;
+    }
+
     private final String name;
 
     private BarcodeFormat(String name) {
@@ -91,17 +102,6 @@ public final class BarcodeFormat {
     @Override
     public String toString() {
         return name;
-    }
-
-    public static BarcodeFormat valueOf(String name) {
-        if (name == null || name.length() == 0) {
-            throw new IllegalArgumentException();
-        }
-        BarcodeFormat format = VALUES.get(name);
-        if (format == null) {
-            throw new IllegalArgumentException();
-        }
-        return format;
     }
 
 }

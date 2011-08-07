@@ -16,6 +16,8 @@
 
 package com.google.zxing.qrcode;
 
+import java.util.Hashtable;
+
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.BinaryBitmap;
 import com.google.zxing.ChecksumException;
@@ -32,72 +34,21 @@ import com.google.zxing.common.DetectorResult;
 import com.google.zxing.qrcode.decoder.Decoder;
 import com.google.zxing.qrcode.detector.Detector;
 
-import java.util.Hashtable;
-
 /**
  * This implementation can detect and decode QR Codes in an image.
- *
+ * 
  * @author Sean Owen
  */
 public class QRCodeReader implements Reader {
 
     private static final ResultPoint[] NO_POINTS = new ResultPoint[0];
 
-    private final Decoder decoder = new Decoder();
-
-    protected Decoder getDecoder() {
-        return decoder;
-    }
-
     /**
-     * Locates and decodes a QR code in an image.
-     *
-     * @return a String representing the content encoded by the QR code
-     * @throws NotFoundException if a QR code cannot be found
-     * @throws FormatException if a QR code cannot be decoded
-     * @throws ChecksumException if error correction fails
-     */
-    @Override
-    public Result decode(BinaryBitmap image) throws NotFoundException, ChecksumException, FormatException {
-        return decode(image, null);
-    }
-
-    @Override
-    public Result decode(BinaryBitmap image, Hashtable<?, ?> hints)
-            throws NotFoundException, ChecksumException, FormatException {
-        DecoderResult decoderResult;
-        ResultPoint[] points;
-        if (hints != null && hints.containsKey(DecodeHintType.PURE_BARCODE)) {
-            BitMatrix bits = extractPureBits(image.getBlackMatrix());
-            decoderResult = decoder.decode(bits, hints);
-            points = NO_POINTS;
-        } else {
-            DetectorResult detectorResult = new Detector(image.getBlackMatrix()).detect(hints);
-            decoderResult = decoder.decode(detectorResult.getBits(), hints);
-            points = detectorResult.getPoints();
-        }
-
-        Result result = new Result(decoderResult.getText(), decoderResult.getRawBytes(), points, BarcodeFormat.QR_CODE);
-        if (decoderResult.getByteSegments() != null) {
-            result.putMetadata(ResultMetadataType.BYTE_SEGMENTS, decoderResult.getByteSegments());
-        }
-        if (decoderResult.getECLevel() != null) {
-            result.putMetadata(ResultMetadataType.ERROR_CORRECTION_LEVEL, decoderResult.getECLevel().toString());
-        }
-        return result;
-    }
-
-    @Override
-    public void reset() {
-        // do nothing
-    }
-
-    /**
-     * This method detects a code in a "pure" image -- that is, pure monochrome image
-     * which contains only an unrotated, unskewed, image of a code, with some white border
-     * around it. This is a specialized method that works exceptionally fast in this special
-     * case.
-     *
+     * This method detects a code in a "pure" image -- that is, pure monochrome
+     * image which contains only an unrotated, unskewed, image of a code, with
+     * some white border around it. This is a specialized method that works
+     * exceptionally fast in this special case.
+     * 
      * @see com.google.zxing.pdf417.PDF417Reader#extractPureBits(BitMatrix)
      * @see com.google.zxing.datamatrix.DataMatrixReader#extractPureBits(BitMatrix)
      */
@@ -164,6 +115,58 @@ public class QRCodeReader implements Reader {
             throw NotFoundException.getNotFoundInstance();
         }
         return moduleSize;
+    }
+
+    private final Decoder decoder = new Decoder();
+
+    /**
+     * Locates and decodes a QR code in an image.
+     * 
+     * @return a String representing the content encoded by the QR code
+     * @throws NotFoundException if a QR code cannot be found
+     * @throws FormatException if a QR code cannot be decoded
+     * @throws ChecksumException if error correction fails
+     */
+    @Override
+    public Result decode(BinaryBitmap image) throws NotFoundException, ChecksumException,
+            FormatException {
+        return decode(image, null);
+    }
+
+    @Override
+    public Result decode(BinaryBitmap image, Hashtable<?, ?> hints) throws NotFoundException,
+            ChecksumException, FormatException {
+        DecoderResult decoderResult;
+        ResultPoint[] points;
+        if (hints != null && hints.containsKey(DecodeHintType.PURE_BARCODE)) {
+            BitMatrix bits = extractPureBits(image.getBlackMatrix());
+            decoderResult = decoder.decode(bits, hints);
+            points = NO_POINTS;
+        } else {
+            DetectorResult detectorResult = new Detector(image.getBlackMatrix()).detect(hints);
+            decoderResult = decoder.decode(detectorResult.getBits(), hints);
+            points = detectorResult.getPoints();
+        }
+
+        Result result = new Result(decoderResult.getText(), decoderResult.getRawBytes(), points,
+                BarcodeFormat.QR_CODE);
+        if (decoderResult.getByteSegments() != null) {
+            result.putMetadata(ResultMetadataType.BYTE_SEGMENTS, decoderResult.getByteSegments());
+        }
+        if (decoderResult.getECLevel() != null) {
+            result.putMetadata(ResultMetadataType.ERROR_CORRECTION_LEVEL, decoderResult
+                    .getECLevel().toString());
+        }
+        return result;
+    }
+
+    protected Decoder getDecoder() {
+        return decoder;
+    }
+
+    @Override
+    public void reset() {
+        // do nothing
     }
 
 }

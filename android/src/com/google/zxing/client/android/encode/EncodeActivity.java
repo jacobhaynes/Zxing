@@ -48,13 +48,27 @@ import com.google.zxing.client.android.R;
  * full screen so that another person can scan it with their device.
  * 
  * @author Jacob Haynes (jacob.haynes@colorado.edu, jacobhayens@google.com)
- *  dswitkin@google.com (Daniel Switkin)
+ *         dswitkin@google.com (Daniel Switkin)
  */
 public final class EncodeActivity extends Activity {
 
     private static final String TAG = EncodeActivity.class.getSimpleName();
 
     private static final int MAX_BARCODE_FILENAME_LENGTH = 24;
+
+    private static CharSequence makeBarcodeFileName(CharSequence contents) {
+        int fileNameLength = Math.min(MAX_BARCODE_FILENAME_LENGTH, contents.length());
+        StringBuilder fileName = new StringBuilder(fileNameLength);
+        for (int i = 0; i < fileNameLength; i++) {
+            char c = contents.charAt(i);
+            if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9')) {
+                fileName.append(c);
+            } else {
+                fileName.append('_');
+            }
+        }
+        return fileName;
+    }
 
     private Encoder encoder;
 
@@ -134,55 +148,41 @@ public final class EncodeActivity extends Activity {
         return true;
     }
 
-    private static CharSequence makeBarcodeFileName(CharSequence contents) {
-        int fileNameLength = Math.min(MAX_BARCODE_FILENAME_LENGTH, contents.length());
-        StringBuilder fileName = new StringBuilder(fileNameLength);
-        for (int i = 0; i < fileNameLength; i++) {
-            char c = contents.charAt(i);
-            if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9')) {
-                fileName.append(c);
-            } else {
-                fileName.append('_');
-            }
-        }
-        return fileName;
-    }
-
     @Override
     protected void onResume() {
         super.onResume();
         // This assumes the view is full screen, which is a good assumption
         WindowManager manager = (WindowManager)getSystemService(WINDOW_SERVICE);
         Display display = manager.getDefaultDisplay();
-        int width = display.getWidth() * 7/8;
-        int height = display.getHeight()* 7/8;
+        int width = display.getWidth() * 7 / 8;
+        int height = display.getHeight() * 7 / 8;
 
         Intent intent = getIntent();
         try {
-            
-            
-            SharedPreferences settings = getSharedPreferences("barcodeFormat",MODE_PRIVATE);
-          //If it is a QR_Code, make sure that it is a square (for purpose of showing text
-            if (BarcodeFormat.QR_CODE.toString()
-                    .equals(settings.getString("barcodeFormat", BarcodeFormat.QR_CODE.toString()))){
+
+            SharedPreferences settings = getSharedPreferences("barcodeFormat", MODE_PRIVATE);
+            // If it is a QR_Code, make sure that it is a square (for purpose of
+            // showing text
+            if (BarcodeFormat.QR_CODE.toString().equals(
+                    settings.getString("barcodeFormat", BarcodeFormat.QR_CODE.toString()))) {
                 if (height > width) {
                     height = width;
                 } else {
                     width = height;
                 }
             }
-            
+
             encoder = new Encoder(this, intent, width, height);
             setTitle(getString(R.string.app_name) + " - " + encoder.getTitle());
             Bitmap bitmap = encoder.encodeAsBitmap();
             ImageView view = (ImageView)findViewById(R.id.image_view);
             view.setImageBitmap(bitmap);
-            
-            //text can mess up PDF417?
-            //if (!encoder.format.equals(BarcodeFormat.PDF_417)){
-              TextView contents = (TextView) findViewById(R.id.contents_text_view);
-              contents.setText(encoder.getDisplayContents());
-            //}
+
+            // text can mess up PDF417?
+            // if (!encoder.format.equals(BarcodeFormat.PDF_417)){
+            TextView contents = (TextView)findViewById(R.id.contents_text_view);
+            contents.setText(encoder.getDisplayContents());
+            // }
         } catch (WriterException e) {
             Log.e(TAG, "Could not encode barcode", e);
             showErrorMessage(R.string.msg_encode_contents_failed);

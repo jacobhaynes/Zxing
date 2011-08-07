@@ -27,15 +27,29 @@ public final class QRCode {
 
     public static final int NUM_MASK_PATTERNS = 8;
 
+    // Check if "mask_pattern" is valid.
+    public static boolean isValidMaskPattern(int maskPattern) {
+        return maskPattern >= 0 && maskPattern < NUM_MASK_PATTERNS;
+    }
+
     private Mode mode;
+
     private ErrorCorrectionLevel ecLevel;
+
     private int version;
+
     private int matrixWidth;
+
     private int maskPattern;
+
     private int numTotalBytes;
+
     private int numDataBytes;
+
     private int numECBytes;
+
     private int numRSBlocks;
+
     private ByteMatrix matrix;
 
     public QRCode() {
@@ -51,9 +65,19 @@ public final class QRCode {
         matrix = null;
     }
 
-    // Mode of the QR Code.
-    public Mode getMode() {
-        return mode;
+    // Return the value of the module (cell) pointed by "x" and "y" in the
+    // matrix of the QR Code. They
+    // call cells in the matrix "modules". 1 represents a black cell, and 0
+    // represents a white cell.
+    public int at(int x, int y) {
+        // The value must be zero or one.
+        int value = matrix.get(x, y);
+        if (!(value == 0 || value == 1)) {
+            // this is really like an assert... not sure what better exception
+            // to use?
+            throw new RuntimeException("Bad value");
+        }
+        return value;
     }
 
     // Error correction level of the QR Code.
@@ -61,9 +85,14 @@ public final class QRCode {
         return ecLevel;
     }
 
-    // Version of the QR Code.  The bigger size, the bigger version.
-    public int getVersion() {
-        return version;
+    // Mask pattern of the QR Code.
+    public int getMaskPattern() {
+        return maskPattern;
+    }
+
+    // ByteMatrix data of the QR Code.
+    public ByteMatrix getMatrix() {
+        return matrix;
     }
 
     // ByteMatrix width of the QR Code.
@@ -71,14 +100,9 @@ public final class QRCode {
         return matrixWidth;
     }
 
-    // Mask pattern of the QR Code.
-    public int getMaskPattern() {
-        return maskPattern;
-    }
-
-    // Number of total bytes in the QR Code.
-    public int getNumTotalBytes() {
-        return numTotalBytes;
+    // Mode of the QR Code.
+    public Mode getMode() {
+        return mode;
     }
 
     // Number of data bytes in the QR Code.
@@ -96,46 +120,72 @@ public final class QRCode {
         return numRSBlocks;
     }
 
-    // ByteMatrix data of the QR Code.
-    public ByteMatrix getMatrix() {
-        return matrix;
+    // Number of total bytes in the QR Code.
+    public int getNumTotalBytes() {
+        return numTotalBytes;
     }
 
-
-    // Return the value of the module (cell) pointed by "x" and "y" in the matrix of the QR Code. They
-    // call cells in the matrix "modules". 1 represents a black cell, and 0 represents a white cell.
-    public int at(int x, int y) {
-        // The value must be zero or one.
-        int value = matrix.get(x, y);
-        if (!(value == 0 || value == 1)) {
-            // this is really like an assert... not sure what better exception to use?
-            throw new RuntimeException("Bad value");
-        }
-        return value;
+    // Version of the QR Code. The bigger size, the bigger version.
+    public int getVersion() {
+        return version;
     }
 
-    // Checks all the member variables are set properly. Returns true on success. Otherwise, returns
+    // Checks all the member variables are set properly. Returns true on
+    // success. Otherwise, returns
     // false.
     public boolean isValid() {
         return
-                // First check if all version are not uninitialized.
-                mode != null &&
-                ecLevel != null &&
-                version != -1 &&
-                matrixWidth != -1 &&
-                maskPattern != -1 &&
-                numTotalBytes != -1 &&
-                numDataBytes != -1 &&
-                numECBytes != -1 &&
-                numRSBlocks != -1 &&
+        // First check if all version are not uninitialized.
+        mode != null && ecLevel != null && version != -1 && matrixWidth != -1 && maskPattern != -1
+                && numTotalBytes != -1 && numDataBytes != -1 && numECBytes != -1
+                && numRSBlocks != -1 &&
                 // Then check them in other ways..
-                isValidMaskPattern(maskPattern) &&
-                numTotalBytes == numDataBytes + numECBytes &&
+                isValidMaskPattern(maskPattern) && numTotalBytes == numDataBytes + numECBytes &&
                 // ByteMatrix stuff.
-                matrix != null &&
-                matrixWidth == matrix.getWidth() &&
+                matrix != null && matrixWidth == matrix.getWidth() &&
                 // See 7.3.1 of JISX0510:2004 (p.5).
                 matrix.getWidth() == matrix.getHeight(); // Must be square.
+    }
+
+    public void setECLevel(ErrorCorrectionLevel value) {
+        ecLevel = value;
+    }
+
+    public void setMaskPattern(int value) {
+        maskPattern = value;
+    }
+
+    // This takes ownership of the 2D array.
+    public void setMatrix(ByteMatrix value) {
+        matrix = value;
+    }
+
+    public void setMatrixWidth(int value) {
+        matrixWidth = value;
+    }
+
+    public void setMode(Mode value) {
+        mode = value;
+    }
+
+    public void setNumDataBytes(int value) {
+        numDataBytes = value;
+    }
+
+    public void setNumECBytes(int value) {
+        numECBytes = value;
+    }
+
+    public void setNumRSBlocks(int value) {
+        numRSBlocks = value;
+    }
+
+    public void setNumTotalBytes(int value) {
+        numTotalBytes = value;
+    }
+
+    public void setVersion(int value) {
+        version = value;
     }
 
     // Return debug String.
@@ -171,70 +221,19 @@ public final class QRCode {
         return result.toString();
     }
 
-    public void setMode(Mode value) {
-        mode = value;
-    }
-
-    public void setECLevel(ErrorCorrectionLevel value) {
-        ecLevel = value;
-    }
-
-    public void setVersion(int value) {
-        version = value;
-    }
-
-    public void setMatrixWidth(int value) {
-        matrixWidth = value;
-    }
-
-    public void setMaskPattern(int value) {
-        maskPattern = value;
-    }
-
-    public void setNumTotalBytes(int value) {
-        numTotalBytes = value;
-    }
-
-    public void setNumDataBytes(int value) {
-        numDataBytes = value;
-    }
-
-    public void setNumECBytes(int value) {
-        numECBytes = value;
-    }
-
-    public void setNumRSBlocks(int value) {
-        numRSBlocks = value;
-    }
-
-    // This takes ownership of the 2D array.
-    public void setMatrix(ByteMatrix value) {
-        matrix = value;
-    }
-
-    // Check if "mask_pattern" is valid.
-    public static boolean isValidMaskPattern(int maskPattern) {
-        return maskPattern >= 0 && maskPattern < NUM_MASK_PATTERNS;
-    }
-
     // Return true if the all values in the matrix are binary numbers.
     //
-    // JAVAPORT: This is going to be super expensive and unnecessary, we should not call this in
-    // production. I'm leaving it because it may be useful for testing. It should be removed entirely
+    // JAVAPORT: This is going to be super expensive and unnecessary, we should
+    // not call this in
+    // production. I'm leaving it because it may be useful for testing. It
+    // should be removed entirely
     // if ByteMatrix is changed never to contain a -1.
     /*
-  private static boolean EverythingIsBinary(final ByteMatrix matrix) {
-    for (int y = 0; y < matrix.height(); ++y) {
-      for (int x = 0; x < matrix.width(); ++x) {
-        int value = matrix.get(y, x);
-        if (!(value == 0 || value == 1)) {
-          // Found non zero/one value.
-          return false;
-        }
-      }
-    }
-    return true;
-  }
+     * private static boolean EverythingIsBinary(final ByteMatrix matrix) { for
+     * (int y = 0; y < matrix.height(); ++y) { for (int x = 0; x <
+     * matrix.width(); ++x) { int value = matrix.get(y, x); if (!(value == 0 ||
+     * value == 1)) { // Found non zero/one value. return false; } } } return
+     * true; }
      */
 
 }

@@ -21,7 +21,9 @@ package com.google.zxing.client.result;
  */
 public final class WifiParsedResult extends ParsedResult {
     private final String ssid;
+
     private final String networkEncryption;
+
     private final String password;
 
     public WifiParsedResult(String networkEncryption, String ssid, String password) {
@@ -31,8 +33,13 @@ public final class WifiParsedResult extends ParsedResult {
         this.password = password;
     }
 
-    public String getSsid() {
-        return ssid;
+    @Override
+    public String getDisplayResult() {
+        StringBuffer result = new StringBuffer(80);
+        maybeAppend(ssid, result);
+        maybeAppend(networkEncryption, result);
+        maybeAppend(password, result);
+        return result.toString();
     }
 
     public String getNetworkEncryption() {
@@ -43,12 +50,7 @@ public final class WifiParsedResult extends ParsedResult {
         return password;
     }
 
-    @Override
-    public String getDisplayResult() {
-        StringBuffer result = new StringBuffer(80);
-        maybeAppend(ssid, result);
-        maybeAppend(networkEncryption, result);
-        maybeAppend(password, result);
-        return result.toString();
+    public String getSsid() {
+        return ssid;
     }
 }

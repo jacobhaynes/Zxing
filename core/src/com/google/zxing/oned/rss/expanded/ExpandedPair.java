@@ -35,19 +35,23 @@ import com.google.zxing.oned.rss.FinderPattern;
 final class ExpandedPair {
 
     private final boolean mayBeLast;
+
     private final DataCharacter leftChar;
+
     private final DataCharacter rightChar;
+
     private final FinderPattern finderPattern;
 
-    ExpandedPair(DataCharacter leftChar, DataCharacter rightChar, FinderPattern finderPattern, boolean mayBeLast) {
-        this.leftChar      = leftChar;
-        this.rightChar     = rightChar;
+    ExpandedPair(DataCharacter leftChar, DataCharacter rightChar, FinderPattern finderPattern,
+            boolean mayBeLast) {
+        this.leftChar = leftChar;
+        this.rightChar = rightChar;
         this.finderPattern = finderPattern;
-        this.mayBeLast     = mayBeLast;
+        this.mayBeLast = mayBeLast;
     }
 
-    boolean mayBeLast(){
-        return this.mayBeLast;
+    FinderPattern getFinderPattern() {
+        return this.finderPattern;
     }
 
     DataCharacter getLeftChar() {
@@ -58,8 +62,8 @@ final class ExpandedPair {
         return this.rightChar;
     }
 
-    FinderPattern getFinderPattern() {
-        return this.finderPattern;
+    boolean mayBeLast() {
+        return this.mayBeLast;
     }
 
     public boolean mustBeLast() {

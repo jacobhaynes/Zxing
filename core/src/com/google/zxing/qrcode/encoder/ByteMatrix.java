@@ -17,18 +17,20 @@
 package com.google.zxing.qrcode.encoder;
 
 /**
- * A class which wraps a 2D array of bytes. The default usage is signed. If you want to use it as a
- * unsigned container, it's up to you to do byteValue & 0xff at each location.
- *
- * JAVAPORT: The original code was a 2D array of ints, but since it only ever gets assigned
- * -1, 0, and 1, I'm going to use less memory and go with bytes.
- *
+ * A class which wraps a 2D array of bytes. The default usage is signed. If you
+ * want to use it as a unsigned container, it's up to you to do byteValue & 0xff
+ * at each location. JAVAPORT: The original code was a 2D array of ints, but
+ * since it only ever gets assigned -1, 0, and 1, I'm going to use less memory
+ * and go with bytes.
+ * 
  * @author dswitkin@google.com (Daniel Switkin)
  */
 public final class ByteMatrix {
 
     private final byte[][] bytes;
+
     private final int width;
+
     private final int height;
 
     public ByteMatrix(int width, int height) {
@@ -37,12 +39,12 @@ public final class ByteMatrix {
         this.height = height;
     }
 
-    public int getHeight() {
-        return height;
-    }
-
-    public int getWidth() {
-        return width;
+    public void clear(byte value) {
+        for (int y = 0; y < height; ++y) {
+            for (int x = 0; x < width; ++x) {
+                bytes[y][x] = value;
+            }
+        }
     }
 
     public byte get(int x, int y) {
@@ -53,24 +55,24 @@ public final class ByteMatrix {
         return bytes;
     }
 
+    public int getHeight() {
+        return height;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public void set(int x, int y, boolean value) {
+        bytes[y][x] = (byte)(value ? 1 : 0);
+    }
+
     public void set(int x, int y, byte value) {
         bytes[y][x] = value;
     }
 
     public void set(int x, int y, int value) {
-        bytes[y][x] = (byte) value;
-    }
-
-    public void set(int x, int y, boolean value) {
-        bytes[y][x] = (byte) (value ? 1 : 0);
-    }
-
-    public void clear(byte value) {
-        for (int y = 0; y < height; ++y) {
-            for (int x = 0; x < width; ++x) {
-                bytes[y][x] = value;
-            }
-        }
+        bytes[y][x] = (byte)value;
     }
 
     @Override

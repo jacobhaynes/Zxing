@@ -16,17 +16,17 @@
 
 package com.google.zxing.pdf417;
 
+import java.util.Hashtable;
+
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.Writer;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.pdf417.encoder.PDF417Encoder;
 
-import java.util.Hashtable;
-
 /**
  * This object renders a QR Code as a BitMatrix 2D array of greyscale values.
- *
+ * 
  * @author dswitkin@google.com (Daniel Switkin)
  */
 public final class PDF417Writer implements Writer {
@@ -41,7 +41,7 @@ public final class PDF417Writer implements Writer {
     @Override
     public BitMatrix encode(String contents, BarcodeFormat format, int width, int height,
             Hashtable<?, ?> hints) throws WriterException {
-        //Hints does nothing
+        // Hints does nothing
 
         if (contents == null || contents.length() == 0) {
             throw new IllegalArgumentException("Found empty contents");
@@ -52,8 +52,8 @@ public final class PDF417Writer implements Writer {
         }
 
         if (width < 0 || height < 0) {
-            throw new IllegalArgumentException("Requested dimensions are too small: " + width + 'x' +
-                    height);
+            throw new IllegalArgumentException("Requested dimensions are too small: " + width + 'x'
+                    + height);
         }
 
         return PDF417Encoder.encode(contents, width, height);

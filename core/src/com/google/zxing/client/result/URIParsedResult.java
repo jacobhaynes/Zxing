@@ -21,7 +21,45 @@ package com.google.zxing.client.result;
  */
 public final class URIParsedResult extends ParsedResult {
 
+    private static boolean isColonFollowedByPortNumber(String uri, int protocolEnd) {
+        int nextSlash = uri.indexOf('/', protocolEnd + 1);
+        if (nextSlash < 0) {
+            nextSlash = uri.length();
+        }
+        if (nextSlash <= protocolEnd + 1) {
+            return false;
+        }
+        for (int x = protocolEnd + 1; x < nextSlash; x++) {
+            if (uri.charAt(x) < '0' || uri.charAt(x) > '9') {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Transforms a string that represents a URI into something more proper, by
+     * adding or canonicalizing the protocol.
+     */
+    private static String massageURI(String uri) {
+        uri = uri.trim();
+        int protocolEnd = uri.indexOf(':');
+        if (protocolEnd < 0) {
+            // No protocol, assume http
+            uri = "http://" + uri;
+        } else if (isColonFollowedByPortNumber(uri, protocolEnd)) {
+            // Found a colon, but it looks like it is after the host, so the
+            // protocol is still missing
+            uri = "http://" + uri;
+        } else {
+            // Lowercase protocol to avoid problems
+            uri = uri.substring(0, protocolEnd).toLowerCase() + uri.substring(protocolEnd);
+        }
+        return uri;
+    }
+
     private final String uri;
+
     private final String title;
 
     public URIParsedResult(String uri, String title) {
@@ -30,29 +68,10 @@ public final class URIParsedResult extends ParsedResult {
         this.title = title;
     }
 
-    public String getURI() {
-        return uri;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    /**
-     * @return true if the URI contains suspicious patterns that may suggest it intends to
-     *  mislead the user about its true nature. At the moment this looks for the presence
-     *  of user/password syntax in the host/authority portion of a URI which may be used
-     *  in attempts to make the URI's host appear to be other than it is. Example:
-     *  http://yourbank.com@phisher.com  This URI connects to phisher.com but may appear
-     *  to connect to yourbank.com at first glance.
-     */
-    public boolean isPossiblyMaliciousURI() {
-        return containsUser();
-    }
-
     private boolean containsUser() {
         // This method is likely not 100% RFC compliant yet
-        int hostStart = uri.indexOf(':'); // we should always have scheme at this point
+        int hostStart = uri.indexOf(':'); // we should always have scheme at
+                                          // this point
         hostStart++;
         // Skip slashes preceding host
         int uriLength = uri.length();
@@ -75,41 +94,25 @@ public final class URIParsedResult extends ParsedResult {
         return result.toString();
     }
 
-    /**
-     * Transforms a string that represents a URI into something more proper, by adding or canonicalizing
-     * the protocol.
-     */
-    private static String massageURI(String uri) {
-        uri = uri.trim();
-        int protocolEnd = uri.indexOf(':');
-        if (protocolEnd < 0) {
-            // No protocol, assume http
-            uri = "http://" + uri;
-        } else if (isColonFollowedByPortNumber(uri, protocolEnd)) {
-            // Found a colon, but it looks like it is after the host, so the protocol is still missing
-            uri = "http://" + uri;
-        } else {
-            // Lowercase protocol to avoid problems
-            uri = uri.substring(0, protocolEnd).toLowerCase() + uri.substring(protocolEnd);
-        }
+    public String getTitle() {
+        return title;
+    }
+
+    public String getURI() {
         return uri;
     }
 
-    private static boolean isColonFollowedByPortNumber(String uri, int protocolEnd) {
-        int nextSlash = uri.indexOf('/', protocolEnd + 1);
-        if (nextSlash < 0) {
-            nextSlash = uri.length();
-        }
-        if (nextSlash <= protocolEnd + 1) {
-            return false;
-        }
-        for (int x = protocolEnd + 1; x < nextSlash; x++) {
-            if (uri.charAt(x) < '0' || uri.charAt(x) > '9') {
-                return false;
-            }
-        }
-        return true;
+    /**
+     * @return true if the URI contains suspicious patterns that may suggest it
+     *         intends to mislead the user about its true nature. At the moment
+     *         this looks for the presence of user/password syntax in the
+     *         host/authority portion of a URI which may be used in attempts to
+     *         make the URI's host appear to be other than it is. Example:
+     *         http://yourbank.com@phisher.com This URI connects to phisher.com
+     *         but may appear to connect to yourbank.com at first glance.
+     */
+    public boolean isPossiblyMaliciousURI() {
+        return containsUser();
     }
-
 
 }

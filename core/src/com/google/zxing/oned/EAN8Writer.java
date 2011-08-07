@@ -16,15 +16,15 @@
 
 package com.google.zxing.oned;
 
+import java.util.Hashtable;
+
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 
-import java.util.Hashtable;
-
 /**
  * This object renders an EAN8 code as a {@link BitMatrix}.
- *
+ * 
  * @author aripollak@gmail.com (Ari Pollak)
  */
 public final class EAN8Writer extends UPCEANWriter {
@@ -34,17 +34,6 @@ public final class EAN8Writer extends UPCEANWriter {
             5 + // middle guard
             (7 * 4) + // right bars
             3; // end guard
-
-    @Override
-    public BitMatrix encode(String contents, BarcodeFormat format, int width, int height,
-            Hashtable<?, ?> hints) throws WriterException {
-        if (format != BarcodeFormat.EAN_8) {
-            throw new IllegalArgumentException("Can only encode EAN_8, but got "
-                    + format);
-        }
-
-        return super.encode(contents, format, width, height, hints);
-    }
 
     /** @return a byte array of horizontal pixels (0 = white, 1 = black) */
     @Override
@@ -73,6 +62,16 @@ public final class EAN8Writer extends UPCEANWriter {
         pos += appendPattern(result, pos, UPCEANReader.START_END_PATTERN, 1);
 
         return result;
+    }
+
+    @Override
+    public BitMatrix encode(String contents, BarcodeFormat format, int width, int height,
+            Hashtable<?, ?> hints) throws WriterException {
+        if (format != BarcodeFormat.EAN_8) {
+            throw new IllegalArgumentException("Can only encode EAN_8, but got " + format);
+        }
+
+        return super.encode(contents, format, width, height, hints);
     }
 
 }

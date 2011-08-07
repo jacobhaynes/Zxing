@@ -27,14 +27,12 @@ import com.google.zxing.oned.UPCEReader;
  */
 final class ProductResultParser extends ResultParser {
 
-    private ProductResultParser() {
-    }
-
-    // Treat all UPC and EAN variants as UPCs, in the sense that they are all product barcodes.
+    // Treat all UPC and EAN variants as UPCs, in the sense that they are all
+    // product barcodes.
     public static ProductParsedResult parse(Result result) {
         BarcodeFormat format = result.getBarcodeFormat();
-        if (!(BarcodeFormat.UPC_A.equals(format) || BarcodeFormat.UPC_E.equals(format) ||
-                BarcodeFormat.EAN_8.equals(format) || BarcodeFormat.EAN_13.equals(format))) {
+        if (!(BarcodeFormat.UPC_A.equals(format) || BarcodeFormat.UPC_E.equals(format)
+                || BarcodeFormat.EAN_8.equals(format) || BarcodeFormat.EAN_13.equals(format))) {
             return null;
         }
         // Really neither of these should happen:
@@ -61,6 +59,9 @@ final class ProductResultParser extends ResultParser {
         }
 
         return new ProductParsedResult(rawText, normalizedProductID);
+    }
+
+    private ProductResultParser() {
     }
 
 }

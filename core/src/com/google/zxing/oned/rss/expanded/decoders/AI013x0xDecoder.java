@@ -35,6 +35,7 @@ import com.google.zxing.common.BitArray;
 abstract class AI013x0xDecoder extends AI01weightDecoder {
 
     private static final int headerSize = 4 + 1;
+
     private static final int weightSize = 15;
 
     AI013x0xDecoder(BitArray information) {

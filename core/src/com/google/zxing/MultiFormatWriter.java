@@ -16,6 +16,8 @@
 
 package com.google.zxing;
 
+import java.util.Hashtable;
+
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.oned.Code128Writer;
 import com.google.zxing.oned.Code39Writer;
@@ -23,22 +25,20 @@ import com.google.zxing.oned.EAN13Writer;
 import com.google.zxing.oned.EAN8Writer;
 import com.google.zxing.oned.ITFWriter;
 import com.google.zxing.oned.UPCAWriter;
-import com.google.zxing.qrcode.QRCodeWriter;
 import com.google.zxing.pdf417.PDF417Writer;
-
-import java.util.Hashtable;
+import com.google.zxing.qrcode.QRCodeWriter;
 
 /**
- * This is a factory class which finds the appropriate Writer subclass for the BarcodeFormat
- * requested and encodes the barcode with the supplied contents.
- *
+ * This is a factory class which finds the appropriate Writer subclass for the
+ * BarcodeFormat requested and encodes the barcode with the supplied contents.
+ * 
  * @author dswitkin@google.com (Daniel Switkin)
  */
 public final class MultiFormatWriter implements Writer {
 
     @Override
-    public BitMatrix encode(String contents, BarcodeFormat format, int width,
-            int height) throws WriterException {
+    public BitMatrix encode(String contents, BarcodeFormat format, int width, int height)
+            throws WriterException {
 
         return encode(contents, format, width, height, null);
     }
@@ -62,7 +62,7 @@ public final class MultiFormatWriter implements Writer {
             writer = new Code128Writer();
         } else if (format == BarcodeFormat.ITF) {
             writer = new ITFWriter();
-        } else if (format == BarcodeFormat.PDF_417){
+        } else if (format == BarcodeFormat.PDF_417) {
             writer = new PDF417Writer();
         } else {
             throw new IllegalArgumentException("No encoder available for format " + format);

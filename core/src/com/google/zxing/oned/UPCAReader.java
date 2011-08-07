@@ -16,6 +16,8 @@
 
 package com.google.zxing.oned;
 
+import java.util.Hashtable;
+
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.BinaryBitmap;
 import com.google.zxing.ChecksumException;
@@ -24,22 +26,43 @@ import com.google.zxing.NotFoundException;
 import com.google.zxing.Result;
 import com.google.zxing.common.BitArray;
 
-import java.util.Hashtable;
-
 /**
- * <p>Implements decoding of the UPC-A format.</p>
- *
+ * <p>
+ * Implements decoding of the UPC-A format.
+ * </p>
+ * 
  * @author dswitkin@google.com (Daniel Switkin)
  * @author Sean Owen
  */
 public final class UPCAReader extends UPCEANReader {
 
+    private static Result maybeReturnResult(Result result) throws FormatException {
+        String text = result.getText();
+        if (text.charAt(0) == '0') {
+            return new Result(text.substring(1), null, result.getResultPoints(),
+                    BarcodeFormat.UPC_A);
+        } else {
+            throw FormatException.getFormatInstance();
+        }
+    }
+
     private final UPCEANReader ean13Reader = new EAN13Reader();
 
     @Override
-    public Result decodeRow(int rowNumber, BitArray row, int[] startGuardRange, Hashtable<?, ?> hints)
-            throws NotFoundException, FormatException, ChecksumException {
-        return maybeReturnResult(ean13Reader.decodeRow(rowNumber, row, startGuardRange, hints));
+    public Result decode(BinaryBitmap image) throws NotFoundException, FormatException {
+        return maybeReturnResult(ean13Reader.decode(image));
+    }
+
+    @Override
+    public Result decode(BinaryBitmap image, Hashtable<?, ?> hints) throws NotFoundException,
+            FormatException {
+        return maybeReturnResult(ean13Reader.decode(image, hints));
+    }
+
+    @Override
+    protected int decodeMiddle(BitArray row, int[] startRange, StringBuffer resultString)
+            throws NotFoundException {
+        return ean13Reader.decodeMiddle(row, startRange, resultString);
     }
 
     @Override
@@ -49,33 +72,14 @@ public final class UPCAReader extends UPCEANReader {
     }
 
     @Override
-    public Result decode(BinaryBitmap image) throws NotFoundException, FormatException {
-        return maybeReturnResult(ean13Reader.decode(image));
-    }
-
-    @Override
-    public Result decode(BinaryBitmap image, Hashtable<?, ?> hints) throws NotFoundException, FormatException {
-        return maybeReturnResult(ean13Reader.decode(image, hints));
+    public Result decodeRow(int rowNumber, BitArray row, int[] startGuardRange,
+            Hashtable<?, ?> hints) throws NotFoundException, FormatException, ChecksumException {
+        return maybeReturnResult(ean13Reader.decodeRow(rowNumber, row, startGuardRange, hints));
     }
 
     @Override
     BarcodeFormat getBarcodeFormat() {
         return BarcodeFormat.UPC_A;
-    }
-
-    @Override
-    protected int decodeMiddle(BitArray row, int[] startRange, StringBuffer resultString)
-            throws NotFoundException {
-        return ean13Reader.decodeMiddle(row, startRange, resultString);
-    }
-
-    private static Result maybeReturnResult(Result result) throws FormatException {
-        String text = result.getText();
-        if (text.charAt(0) == '0') {
-            return new Result(text.substring(1), null, result.getResultPoints(), BarcodeFormat.UPC_A);
-        } else {
-            throw FormatException.getFormatInstance();
-        }
     }
 
 }

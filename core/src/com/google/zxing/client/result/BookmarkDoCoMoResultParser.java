@@ -23,9 +23,6 @@ import com.google.zxing.Result;
  */
 final class BookmarkDoCoMoResultParser extends AbstractDoCoMoResultParser {
 
-    private BookmarkDoCoMoResultParser() {
-    }
-
     public static URIParsedResult parse(Result result) {
         String rawText = result.getText();
         if (rawText == null || !rawText.startsWith("MEBKM:")) {
@@ -41,6 +38,9 @@ final class BookmarkDoCoMoResultParser extends AbstractDoCoMoResultParser {
             return null;
         }
         return new URIParsedResult(uri, title);
+    }
+
+    private BookmarkDoCoMoResultParser() {
     }
 
 }

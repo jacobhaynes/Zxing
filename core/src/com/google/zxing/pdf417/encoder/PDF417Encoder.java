@@ -36,65 +36,157 @@ public final class PDF417Encoder {
 
     // The original table is defined in the table 5 of JISX0510:2004 (p.19).
     private static final int[] ALPHANUMERIC_TABLE = {
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 0x00-0x0f
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 0x10-0x1f
-        36, -1, -1, -1, 37, 38, -1, -1, -1, -1, 39, 40, -1, 41, 42, 43, // 0x20-0x2f
-        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 44, -1, -1, -1, -1, -1, // 0x30-0x3f
-        -1, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, // 0x40-0x4f
-        25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, -1, -1, -1, -1, -1, // 0x50-0x5f
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 0x00-0x0f
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 0x10-0x1f
+            36, -1, -1, -1, 37, 38, -1, -1, -1, -1, 39, 40, -1, 41, 42, 43, // 0x20-0x2f
+            0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 44, -1, -1, -1, -1, -1, // 0x30-0x3f
+            -1, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, // 0x40-0x4f
+            25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, -1, -1, -1, -1, -1, // 0x50-0x5f
     };
 
     static final String DEFAULT_BYTE_MODE_ENCODING = "ISO-8859-1";
 
-    private PDF417Encoder() {
-    }
-    
-    public static BitMatrix encode(String content, int Height, int Width) {
-        PDF417Ext encoderExt = new PDF417Ext();
-       //Give it data to be encoded
-        encoderExt.setData(content.getBytes());
-       //Find the Error correction level automatically
-        encoderExt.setSize(10, 2);
-        
-        encoderExt.encode();
-        encoderExt.createArray();
-        byte[][] originalScale = encoderExt.getArray();
-        if ((Height > Width) ^ (originalScale[0].length < originalScale.length)){
-            originalScale = encoderExt.getFlippedArray();
+    static void append8BitBytes(String content, BitArray bits, String encoding)
+            throws WriterException {
+        byte[] bytes;
+        try {
+            bytes = content.getBytes(encoding);
+        } catch (UnsupportedEncodingException uee) {
+            throw new WriterException(uee.toString());
         }
-        
-        int scaleX = Width/originalScale[0].length;
-        int scaleY = Height/originalScale.length;
-        
-        int scale = 1;
-        if (scaleX < scaleY){
-          scale = scaleX;
-        } else {
-          scale = scaleY;
-        }
-        
-        if (scale > 1){
-            return bitMatrixFrombitArray(encoderExt.getScaleArray(scale));
-        } else {
-            return bitMatrixFrombitArray(originalScale);
+        for (int i = 0; i < bytes.length; ++i) {
+            bits.appendBits(bytes[i], 8);
         }
     }
 
-    /*public static void encode(String content, ErrorCorrectionLevel ecLevel, Hashtable<?, ?> hints,
-            PDF417 pdf417) throws WriterException {
-        return;
-    }*/
-    
+    static void appendAlphanumericBytes(String content, BitArray bits) throws WriterException {
+        int length = content.length();
+        int i = 0;
+        while (i < length) {
+            int code1 = getAlphanumericCode(content.charAt(i));
+            if (code1 == -1) {
+                throw new WriterException();
+            }
+            if (i + 1 < length) {
+                int code2 = getAlphanumericCode(content.charAt(i + 1));
+                if (code2 == -1) {
+                    throw new WriterException();
+                }
+                // Encode two alphanumeric letters in 11 bits.
+                bits.appendBits(code1 * 45 + code2, 11);
+                i += 2;
+            } else {
+                // Encode one alphanumeric letter in six bits.
+                bits.appendBits(code1, 6);
+                i++;
+            }
+        }
+    }
+
+    /*
+     * public static void encode(String content, ErrorCorrectionLevel ecLevel,
+     * Hashtable<?, ?> hints, PDF417 pdf417) throws WriterException { return; }
+     */
 
     /**
-     * @return the code point of the table used in alphanumeric mode or -1 if
-     *         there is no corresponding code in the table.
+     * Append "bytes" in "mode" mode (encoding) into "bits". On success, store
+     * the result in "bits".
      */
-    static int getAlphanumericCode(int code) {
-        if (code < ALPHANUMERIC_TABLE.length) {
-            return ALPHANUMERIC_TABLE[code];
+    static void appendBytes(String content, Mode mode, BitArray bits, String encoding)
+            throws WriterException {
+        if (mode.equals(Mode.NUMERIC)) {
+            appendNumericBytes(content, bits);
+        } else if (mode.equals(Mode.ALPHANUMERIC)) {
+            appendAlphanumericBytes(content, bits);
+        } else if (mode.equals(Mode.BYTE)) {
+            append8BitBytes(content, bits, encoding);
+        } else if (mode.equals(Mode.KANJI)) {
+            appendKanjiBytes(content, bits);
+        } else {
+            throw new WriterException("Invalid mode: " + mode);
         }
-        return -1;
+    }
+
+    static void appendKanjiBytes(String content, BitArray bits) throws WriterException {
+        byte[] bytes;
+        try {
+            bytes = content.getBytes("Shift_JIS");
+        } catch (UnsupportedEncodingException uee) {
+            throw new WriterException(uee.toString());
+        }
+        int length = bytes.length;
+        for (int i = 0; i < length; i += 2) {
+            int byte1 = bytes[i] & 0xFF;
+            int byte2 = bytes[i + 1] & 0xFF;
+            int code = (byte1 << 8) | byte2;
+            int subtracted = -1;
+            if (code >= 0x8140 && code <= 0x9ffc) {
+                subtracted = code - 0x8140;
+            } else if (code >= 0xe040 && code <= 0xebbf) {
+                subtracted = code - 0xc140;
+            }
+            if (subtracted == -1) {
+                throw new WriterException("Invalid byte sequence");
+            }
+            int encoded = ((subtracted >> 8) * 0xc0) + (subtracted & 0xff);
+            bits.appendBits(encoded, 13);
+        }
+    }
+
+    /**
+     * Append length info. On success, store the result in "bits".
+     */
+    static void appendLengthInfo(int numLetters, int version, Mode mode, BitArray bits)
+            throws WriterException {
+        int numBits = mode.getCharacterCountBits(Version.getVersionForNumber(version));
+        if (numLetters > ((1 << numBits) - 1)) {
+            throw new WriterException(numLetters + "is bigger than" + ((1 << numBits) - 1));
+        }
+        bits.appendBits(numLetters, numBits);
+    }
+
+    /**
+     * Append mode info. On success, store the result in "bits".
+     */
+    static void appendModeInfo(Mode mode, BitArray bits) {
+        bits.appendBits(mode.getBits(), 4);
+    }
+
+    static void appendNumericBytes(String content, BitArray bits) {
+        int length = content.length();
+        int i = 0;
+        while (i < length) {
+            int num1 = content.charAt(i) - '0';
+            if (i + 2 < length) {
+                // Encode three numeric letters in ten bits.
+                int num2 = content.charAt(i + 1) - '0';
+                int num3 = content.charAt(i + 2) - '0';
+                bits.appendBits(num1 * 100 + num2 * 10 + num3, 10);
+                i += 3;
+            } else if (i + 1 < length) {
+                // Encode two numeric letters in seven bits.
+                int num2 = content.charAt(i + 1) - '0';
+                bits.appendBits(num1 * 10 + num2, 7);
+                i += 2;
+            } else {
+                // Encode one numeric letter in four bits.
+                bits.appendBits(num1, 4);
+                i++;
+            }
+        }
+    }
+
+    private static BitMatrix bitMatrixFrombitArray(byte[][] input) {
+        BitMatrix output = new BitMatrix(input.length, input[0].length);
+        output.clear();
+        for (int ii = 0; ii < input.length; ii++) {
+            for (int jj = 0; jj < input[0].length; jj++) {
+                // Zero is white in the bytematrix
+                if (input[ii][jj] == 0)
+                    output.set(ii, jj);
+            }
+        }
+        return output;
     }
 
     public static Mode chooseMode(String content) {
@@ -131,56 +223,61 @@ public final class PDF417Encoder {
         return Mode.BYTE;
     }
 
-    private static boolean isOnlyDoubleByteKanji(String content) {
-        byte[] bytes;
-        try {
-            bytes = content.getBytes("Shift_JIS");
-        } catch (UnsupportedEncodingException uee) {
-            return false;
+    public static BitMatrix encode(String content, int Height, int Width) {
+        PDF417Ext encoderExt = new PDF417Ext();
+        // Give it data to be encoded
+        encoderExt.setData(content.getBytes());
+        // Find the Error correction level automatically
+        encoderExt.setSize(10, 2);
+
+        encoderExt.encode();
+        encoderExt.createArray();
+        byte[][] originalScale = encoderExt.getArray();
+        if ((Height > Width) ^ (originalScale[0].length < originalScale.length)) {
+            originalScale = encoderExt.getFlippedArray();
         }
-        int length = bytes.length;
-        if (length % 2 != 0) {
-            return false;
+
+        int scaleX = Width / originalScale[0].length;
+        int scaleY = Height / originalScale.length;
+
+        int scale = 1;
+        if (scaleX < scaleY) {
+            scale = scaleX;
+        } else {
+            scale = scaleY;
         }
-        for (int i = 0; i < length; i += 2) {
-            int byte1 = bytes[i] & 0xFF;
-            if ((byte1 < 0x81 || byte1 > 0x9F) && (byte1 < 0xE0 || byte1 > 0xEB)) {
-                return false;
-            }
+
+        if (scale > 1) {
+            return bitMatrixFrombitArray(encoderExt.getScaleArray(scale));
+        } else {
+            return bitMatrixFrombitArray(originalScale);
         }
-        return true;
+    }
+
+    static byte[] generateECBytes(byte[] dataBytes, int numEcBytesInBlock) {
+        int numDataBytes = dataBytes.length;
+        int[] toEncode = new int[numDataBytes + numEcBytesInBlock];
+        for (int i = 0; i < numDataBytes; i++) {
+            toEncode[i] = dataBytes[i] & 0xFF;
+        }
+        new ReedSolomonEncoder(GenericGF.QR_CODE_FIELD_256).encode(toEncode, numEcBytesInBlock);
+
+        byte[] ecBytes = new byte[numEcBytesInBlock];
+        for (int i = 0; i < numEcBytesInBlock; i++) {
+            ecBytes[i] = (byte)toEncode[numDataBytes + i];
+        }
+        return ecBytes;
     }
 
     /**
-     * Terminate bits as described in 8.4.8 and 8.4.9 of JISX0510:2004 (p.24).
+     * @return the code point of the table used in alphanumeric mode or -1 if
+     *         there is no corresponding code in the table.
      */
-    static void terminateBits(int numDataBytes, BitArray bits) throws WriterException {
-        int capacity = numDataBytes << 3;
-        if (bits.getSize() > capacity) {
-            throw new WriterException("data bits cannot fit in the QR Code" + bits.getSize()
-                    + " > " + capacity);
+    static int getAlphanumericCode(int code) {
+        if (code < ALPHANUMERIC_TABLE.length) {
+            return ALPHANUMERIC_TABLE[code];
         }
-        for (int i = 0; i < 4 && bits.getSize() < capacity; ++i) {
-            bits.appendBit(false);
-        }
-        // Append termination bits. See 8.4.8 of JISX0510:2004 (p.24) for
-        // details.
-        // If the last byte isn't 8-bit aligned, we'll add padding bits.
-        int numBitsInLastByte = bits.getSize() & 0x07;
-        if (numBitsInLastByte > 0) {
-            for (int i = numBitsInLastByte; i < 8; i++) {
-                bits.appendBit(false);
-            }
-        }
-        // If we have more space, we'll fill the space with padding patterns
-        // defined in 8.4.9 (p.24).
-        int numPaddingBytes = numDataBytes - bits.getSizeInBytes();
-        for (int i = 0; i < numPaddingBytes; ++i) {
-            bits.appendBits((i & 0x01) == 0 ? 0xEC : 0x11, 8);
-        }
-        if (bits.getSize() != capacity) {
-            throw new WriterException("Bits size does not equal capacity");
-        }
+        return -1;
     }
 
     /**
@@ -190,7 +287,7 @@ public final class PDF417Encoder {
      */
     static void getNumDataBytesAndNumECBytesForBlockID(int numTotalBytes, int numDataBytes,
             int numRSBlocks, int blockID, int[] numDataBytesInBlock, int[] numECBytesInBlock)
-                    throws WriterException {
+            throws WriterException {
         if (blockID >= numRSBlocks) {
             throw new WriterException("Block ID too large");
         }
@@ -303,157 +400,59 @@ public final class PDF417Encoder {
         }
     }
 
-    static byte[] generateECBytes(byte[] dataBytes, int numEcBytesInBlock) {
-        int numDataBytes = dataBytes.length;
-        int[] toEncode = new int[numDataBytes + numEcBytesInBlock];
-        for (int i = 0; i < numDataBytes; i++) {
-            toEncode[i] = dataBytes[i] & 0xFF;
-        }
-        new ReedSolomonEncoder(GenericGF.QR_CODE_FIELD_256).encode(toEncode, numEcBytesInBlock);
-
-        byte[] ecBytes = new byte[numEcBytesInBlock];
-        for (int i = 0; i < numEcBytesInBlock; i++) {
-            ecBytes[i] = (byte)toEncode[numDataBytes + i];
-        }
-        return ecBytes;
-    }
-
-    /**
-     * Append mode info. On success, store the result in "bits".
-     */
-    static void appendModeInfo(Mode mode, BitArray bits) {
-        bits.appendBits(mode.getBits(), 4);
-    }
-
-    /**
-     * Append length info. On success, store the result in "bits".
-     */
-    static void appendLengthInfo(int numLetters, int version, Mode mode, BitArray bits)
-            throws WriterException {
-        int numBits = mode.getCharacterCountBits(Version.getVersionForNumber(version));
-        if (numLetters > ((1 << numBits) - 1)) {
-            throw new WriterException(numLetters + "is bigger than" + ((1 << numBits) - 1));
-        }
-        bits.appendBits(numLetters, numBits);
-    }
-
-    /**
-     * Append "bytes" in "mode" mode (encoding) into "bits". On success, store
-     * the result in "bits".
-     */
-    static void appendBytes(String content, Mode mode, BitArray bits, String encoding)
-            throws WriterException {
-        if (mode.equals(Mode.NUMERIC)) {
-            appendNumericBytes(content, bits);
-        } else if (mode.equals(Mode.ALPHANUMERIC)) {
-            appendAlphanumericBytes(content, bits);
-        } else if (mode.equals(Mode.BYTE)) {
-            append8BitBytes(content, bits, encoding);
-        } else if (mode.equals(Mode.KANJI)) {
-            appendKanjiBytes(content, bits);
-        } else {
-            throw new WriterException("Invalid mode: " + mode);
-        }
-    }
-
-    static void appendNumericBytes(String content, BitArray bits) {
-        int length = content.length();
-        int i = 0;
-        while (i < length) {
-            int num1 = content.charAt(i) - '0';
-            if (i + 2 < length) {
-                // Encode three numeric letters in ten bits.
-                int num2 = content.charAt(i + 1) - '0';
-                int num3 = content.charAt(i + 2) - '0';
-                bits.appendBits(num1 * 100 + num2 * 10 + num3, 10);
-                i += 3;
-            } else if (i + 1 < length) {
-                // Encode two numeric letters in seven bits.
-                int num2 = content.charAt(i + 1) - '0';
-                bits.appendBits(num1 * 10 + num2, 7);
-                i += 2;
-            } else {
-                // Encode one numeric letter in four bits.
-                bits.appendBits(num1, 4);
-                i++;
-            }
-        }
-    }
-
-    static void appendAlphanumericBytes(String content, BitArray bits) throws WriterException {
-        int length = content.length();
-        int i = 0;
-        while (i < length) {
-            int code1 = getAlphanumericCode(content.charAt(i));
-            if (code1 == -1) {
-                throw new WriterException();
-            }
-            if (i + 1 < length) {
-                int code2 = getAlphanumericCode(content.charAt(i + 1));
-                if (code2 == -1) {
-                    throw new WriterException();
-                }
-                // Encode two alphanumeric letters in 11 bits.
-                bits.appendBits(code1 * 45 + code2, 11);
-                i += 2;
-            } else {
-                // Encode one alphanumeric letter in six bits.
-                bits.appendBits(code1, 6);
-                i++;
-            }
-        }
-    }
-
-    static void append8BitBytes(String content, BitArray bits, String encoding)
-            throws WriterException {
-        byte[] bytes;
-        try {
-            bytes = content.getBytes(encoding);
-        } catch (UnsupportedEncodingException uee) {
-            throw new WriterException(uee.toString());
-        }
-        for (int i = 0; i < bytes.length; ++i) {
-            bits.appendBits(bytes[i], 8);
-        }
-    }
-
-    static void appendKanjiBytes(String content, BitArray bits) throws WriterException {
+    private static boolean isOnlyDoubleByteKanji(String content) {
         byte[] bytes;
         try {
             bytes = content.getBytes("Shift_JIS");
         } catch (UnsupportedEncodingException uee) {
-            throw new WriterException(uee.toString());
+            return false;
         }
         int length = bytes.length;
+        if (length % 2 != 0) {
+            return false;
+        }
         for (int i = 0; i < length; i += 2) {
             int byte1 = bytes[i] & 0xFF;
-            int byte2 = bytes[i + 1] & 0xFF;
-            int code = (byte1 << 8) | byte2;
-            int subtracted = -1;
-            if (code >= 0x8140 && code <= 0x9ffc) {
-                subtracted = code - 0x8140;
-            } else if (code >= 0xe040 && code <= 0xebbf) {
-                subtracted = code - 0xc140;
+            if ((byte1 < 0x81 || byte1 > 0x9F) && (byte1 < 0xE0 || byte1 > 0xEB)) {
+                return false;
             }
-            if (subtracted == -1) {
-                throw new WriterException("Invalid byte sequence");
+        }
+        return true;
+    }
+
+    /**
+     * Terminate bits as described in 8.4.8 and 8.4.9 of JISX0510:2004 (p.24).
+     */
+    static void terminateBits(int numDataBytes, BitArray bits) throws WriterException {
+        int capacity = numDataBytes << 3;
+        if (bits.getSize() > capacity) {
+            throw new WriterException("data bits cannot fit in the QR Code" + bits.getSize()
+                    + " > " + capacity);
+        }
+        for (int i = 0; i < 4 && bits.getSize() < capacity; ++i) {
+            bits.appendBit(false);
+        }
+        // Append termination bits. See 8.4.8 of JISX0510:2004 (p.24) for
+        // details.
+        // If the last byte isn't 8-bit aligned, we'll add padding bits.
+        int numBitsInLastByte = bits.getSize() & 0x07;
+        if (numBitsInLastByte > 0) {
+            for (int i = numBitsInLastByte; i < 8; i++) {
+                bits.appendBit(false);
             }
-            int encoded = ((subtracted >> 8) * 0xc0) + (subtracted & 0xff);
-            bits.appendBits(encoded, 13);
+        }
+        // If we have more space, we'll fill the space with padding patterns
+        // defined in 8.4.9 (p.24).
+        int numPaddingBytes = numDataBytes - bits.getSizeInBytes();
+        for (int i = 0; i < numPaddingBytes; ++i) {
+            bits.appendBits((i & 0x01) == 0 ? 0xEC : 0x11, 8);
+        }
+        if (bits.getSize() != capacity) {
+            throw new WriterException("Bits size does not equal capacity");
         }
     }
 
-    private static BitMatrix bitMatrixFrombitArray(byte[][] input){
-        BitMatrix output = new BitMatrix(input.length, input[0].length);
-        output.clear();
-        for (int ii = 0; ii < input.length; ii++){
-            for (int jj = 0; jj < input[0].length; jj++){
-                //Zero is white in the bytematrix
-                if (input[ii][jj] == 0)
-                output.set(ii, jj);
-            }
-        }
-        return output;
+    private PDF417Encoder() {
     }
 
 }

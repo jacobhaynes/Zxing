@@ -33,7 +33,7 @@ abstract class DecodedObject {
 
     protected final int newPosition;
 
-    DecodedObject(int newPosition){
+    DecodedObject(int newPosition) {
         this.newPosition = newPosition;
     }
 

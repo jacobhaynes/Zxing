@@ -21,8 +21,10 @@ import com.google.zxing.NotFoundException;
 import com.google.zxing.common.BitArray;
 
 /**
- * <p>Implements decoding of the EAN-8 format.</p>
- *
+ * <p>
+ * Implements decoding of the EAN-8 format.
+ * </p>
+ * 
  * @author Sean Owen
  */
 public final class EAN8Reader extends UPCEANReader {
@@ -46,7 +48,7 @@ public final class EAN8Reader extends UPCEANReader {
 
         for (int x = 0; x < 4 && rowOffset < end; x++) {
             int bestMatch = decodeDigit(row, counters, rowOffset, L_PATTERNS);
-            result.append((char) ('0' + bestMatch));
+            result.append((char)('0' + bestMatch));
             for (int i = 0; i < counters.length; i++) {
                 rowOffset += counters[i];
             }
@@ -57,7 +59,7 @@ public final class EAN8Reader extends UPCEANReader {
 
         for (int x = 0; x < 4 && rowOffset < end; x++) {
             int bestMatch = decodeDigit(row, counters, rowOffset, L_PATTERNS);
-            result.append((char) ('0' + bestMatch));
+            result.append((char)('0' + bestMatch));
             for (int i = 0; i < counters.length; i++) {
                 rowOffset += counters[i];
             }

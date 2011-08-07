@@ -32,32 +32,45 @@ import com.google.zxing.common.BitMatrix;
 public final class Code128Writer extends UPCEANWriter {
 
     private static final int CODE_START_B = 104;
+
     private static final int CODE_START_C = 105;
+
     private static final int CODE_CODE_B = 100;
+
     private static final int CODE_CODE_C = 99;
+
     private static final int CODE_STOP = 106;
 
     // Dummy characters used to specify control characters in input
     private static final char ESCAPE_FNC_1 = '\u00f1';
+
     private static final char ESCAPE_FNC_2 = '\u00f2';
+
     private static final char ESCAPE_FNC_3 = '\u00f3';
+
     private static final char ESCAPE_FNC_4 = '\u00f4';
 
-    private static final int CODE_FNC_1 = 102;   // Code A, Code B, Code C
-    private static final int CODE_FNC_2 = 97;    // Code A, Code B
-    private static final int CODE_FNC_3 = 96;    // Code A, Code B
+    private static final int CODE_FNC_1 = 102; // Code A, Code B, Code C
+
+    private static final int CODE_FNC_2 = 97; // Code A, Code B
+
+    private static final int CODE_FNC_3 = 96; // Code A, Code B
+
     private static final int CODE_FNC_4_B = 100; // Code B
 
-    @Override
-    public BitMatrix encode(String contents,
-            BarcodeFormat format,
-            int width,
-            int height,
-            Hashtable<?, ?> hints) throws WriterException {
-        if (format != BarcodeFormat.CODE_128) {
-            throw new IllegalArgumentException("Can only encode CODE_128, but got " + format);
+    private static boolean isDigits(String value, int start, int length) {
+        int end = start + length;
+        int last = value.length();
+        for (int i = start; i < end && i < last; i++) {
+            char c = value.charAt(i);
+            if (c < '0' || c > '9') {
+                if (c != ESCAPE_FNC_1) {
+                    return false;
+                }
+                end++; // ignore FNC_1
+            }
         }
-        return super.encode(contents, format, width, height, hints);
+        return end <= last; // end > last if we've run out of string
     }
 
     @Override
@@ -84,14 +97,15 @@ public final class Code128Writer extends UPCEANWriter {
             }
         }
 
-        Vector<int[]> patterns = new Vector<int[]>(); // temporary storage for patterns
+        Vector<int[]> patterns = new Vector<int[]>(); // temporary storage for
+                                                      // patterns
         int checkSum = 0;
         int checkWeight = 1;
         int codeSet = 0; // selected code (CODE_CODE_B or CODE_CODE_C)
         int position = 0; // position in contents
 
         while (position < length) {
-            //Select code to use
+            // Select code to use
             int requiredDigitCount = codeSet == CODE_CODE_C ? 2 : 4;
             int newCodeSet;
             if (isDigits(contents, position, requiredDigitCount)) {
@@ -100,7 +114,7 @@ public final class Code128Writer extends UPCEANWriter {
                 newCodeSet = CODE_CODE_B;
             }
 
-            //Get the pattern index
+            // Get the pattern index
             int patternIndex;
             if (newCodeSet == codeSet) {
                 // Encode the current character
@@ -122,11 +136,13 @@ public final class Code128Writer extends UPCEANWriter {
                             position++;
                             break;
                         case ESCAPE_FNC_4:
-                            patternIndex = CODE_FNC_4_B; // FIXME if this ever outputs Code A
+                            patternIndex = CODE_FNC_4_B; // FIXME if this ever
+                                                         // outputs Code A
                             position++;
                             break;
                         default:
-                            patternIndex = Integer.parseInt(contents.substring(position, position + 2));
+                            patternIndex = Integer.parseInt(contents.substring(position,
+                                    position + 2));
                             position += 2;
                             break;
                     }
@@ -188,19 +204,13 @@ public final class Code128Writer extends UPCEANWriter {
         return result;
     }
 
-    private static boolean isDigits(String value, int start, int length) {
-        int end = start + length;
-        int last = value.length();
-        for (int i = start; i < end && i < last; i++) {
-            char c = value.charAt(i);
-            if (c < '0' || c > '9') {
-                if (c != ESCAPE_FNC_1) {
-                    return false;
-                }
-                end++; // ignore FNC_1
-            }
+    @Override
+    public BitMatrix encode(String contents, BarcodeFormat format, int width, int height,
+            Hashtable<?, ?> hints) throws WriterException {
+        if (format != BarcodeFormat.CODE_128) {
+            throw new IllegalArgumentException("Can only encode CODE_128, but got " + format);
         }
-        return end <= last; // end > last if we've run out of string
+        return super.encode(contents, format, width, height, hints);
     }
 
 }

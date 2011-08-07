@@ -22,26 +22,28 @@ package com.google.zxing.client.result;
 public final class AddressBookParsedResult extends ParsedResult {
 
     private final String[] names;
+
     private final String pronunciation;
+
     private final String[] phoneNumbers;
+
     private final String[] emails;
+
     private final String note;
+
     private final String[] addresses;
+
     private final String org;
+
     private final String birthday;
+
     private final String title;
+
     private final String url;
 
-    public AddressBookParsedResult(String[] names,
-            String pronunciation,
-            String[] phoneNumbers,
-            String[] emails,
-            String note,
-            String[] addresses,
-            String org,
-            String birthday,
-            String title,
-            String url) {
+    public AddressBookParsedResult(String[] names, String pronunciation, String[] phoneNumbers,
+            String[] emails, String note, String[] addresses, String org, String birthday,
+            String title, String url) {
         super(ParsedResultType.ADDRESSBOOK);
         this.names = names;
         this.pronunciation = pronunciation;
@@ -55,46 +57,8 @@ public final class AddressBookParsedResult extends ParsedResult {
         this.url = url;
     }
 
-    public String[] getNames() {
-        return names;
-    }
-
-    /**
-     * In Japanese, the name is written in kanji, which can have multiple readings. Therefore a hint
-     * is often provided, called furigana, which spells the name phonetically.
-     *
-     * @return The pronunciation of the getNames() field, often in hiragana or katakana.
-     */
-    public String getPronunciation() {
-        return pronunciation;
-    }
-
-    public String[] getPhoneNumbers() {
-        return phoneNumbers;
-    }
-
-    public String[] getEmails() {
-        return emails;
-    }
-
-    public String getNote() {
-        return note;
-    }
-
     public String[] getAddresses() {
         return addresses;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getOrg() {
-        return org;
-    }
-
-    public String getURL() {
-        return url;
     }
 
     /**
@@ -118,6 +82,46 @@ public final class AddressBookParsedResult extends ParsedResult {
         maybeAppend(birthday, result);
         maybeAppend(note, result);
         return result.toString();
+    }
+
+    public String[] getEmails() {
+        return emails;
+    }
+
+    public String[] getNames() {
+        return names;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public String getOrg() {
+        return org;
+    }
+
+    public String[] getPhoneNumbers() {
+        return phoneNumbers;
+    }
+
+    /**
+     * In Japanese, the name is written in kanji, which can have multiple
+     * readings. Therefore a hint is often provided, called furigana, which
+     * spells the name phonetically.
+     * 
+     * @return The pronunciation of the getNames() field, often in hiragana or
+     *         katakana.
+     */
+    public String getPronunciation() {
+        return pronunciation;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getURL() {
+        return url;
     }
 
 }

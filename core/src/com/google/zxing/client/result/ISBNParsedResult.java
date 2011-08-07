@@ -28,12 +28,12 @@ public final class ISBNParsedResult extends ParsedResult {
         this.isbn = isbn;
     }
 
-    public String getISBN() {
+    @Override
+    public String getDisplayResult() {
         return isbn;
     }
 
-    @Override
-    public String getDisplayResult() {
+    public String getISBN() {
         return isbn;
     }
 

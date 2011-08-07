@@ -22,14 +22,21 @@ package com.google.zxing.client.result;
 public final class SMSParsedResult extends ParsedResult {
 
     private final String[] numbers;
+
     private final String[] vias;
+
     private final String subject;
+
     private final String body;
 
     public SMSParsedResult(String number, String via, String subject, String body) {
         super(ParsedResultType.SMS);
-        this.numbers = new String[] {number};
-        this.vias = new String[] {via};
+        this.numbers = new String[] {
+            number
+        };
+        this.vias = new String[] {
+            via
+        };
         this.subject = subject;
         this.body = body;
     }
@@ -40,6 +47,23 @@ public final class SMSParsedResult extends ParsedResult {
         this.vias = vias;
         this.subject = subject;
         this.body = body;
+    }
+
+    public String getBody() {
+        return body;
+    }
+
+    @Override
+    public String getDisplayResult() {
+        StringBuffer result = new StringBuffer(100);
+        maybeAppend(numbers, result);
+        maybeAppend(subject, result);
+        maybeAppend(body, result);
+        return result.toString();
+    }
+
+    public String[] getNumbers() {
+        return numbers;
     }
 
     public String getSMSURI() {
@@ -77,29 +101,12 @@ public final class SMSParsedResult extends ParsedResult {
         return result.toString();
     }
 
-    public String[] getNumbers() {
-        return numbers;
-    }
-
-    public String[] getVias() {
-        return vias;
-    }
-
     public String getSubject() {
         return subject;
     }
 
-    public String getBody() {
-        return body;
-    }
-
-    @Override
-    public String getDisplayResult() {
-        StringBuffer result = new StringBuffer(100);
-        maybeAppend(numbers, result);
-        maybeAppend(subject, result);
-        maybeAppend(body, result);
-        return result.toString();
+    public String[] getVias() {
+        return vias;
     }
 
 }

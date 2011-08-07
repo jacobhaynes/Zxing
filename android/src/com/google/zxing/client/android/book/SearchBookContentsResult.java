@@ -18,49 +18,49 @@ package com.google.zxing.client.android.book;
 
 /**
  * The underlying data for a SBC result.
- *
+ * 
  * @author dswitkin@google.com (Daniel Switkin)
  */
 final class SearchBookContentsResult {
 
-  private static String query;
+    private static String query;
 
-  private final String pageId;
-  private final String pageNumber;
-  private final String snippet;
-  private final boolean validSnippet;
+    public static String getQuery() {
+        return query;
+    }
 
-    SearchBookContentsResult(String pageId,
-                             String pageNumber,
-                             String snippet,
-                             boolean validSnippet) {
-    this.pageId = pageId;
-    this.pageNumber = pageNumber;
-    this.snippet = snippet;
-    this.validSnippet = validSnippet;
-  }
+    public static void setQuery(String query) {
+        SearchBookContentsResult.query = query;
+    }
 
-  public static void setQuery(String query) {
-    SearchBookContentsResult.query = query;
-  }
+    private final String pageId;
 
-  public String getPageId() {
-    return pageId;
-  }
+    private final String pageNumber;
 
-  public String getPageNumber() {
-    return pageNumber;
-  }
+    private final String snippet;
 
-  public String getSnippet() {
-    return snippet;
-  }
+    private final boolean validSnippet;
 
-  public boolean getValidSnippet() {
-    return validSnippet;
-  }
+    SearchBookContentsResult(String pageId, String pageNumber, String snippet, boolean validSnippet) {
+        this.pageId = pageId;
+        this.pageNumber = pageNumber;
+        this.snippet = snippet;
+        this.validSnippet = validSnippet;
+    }
 
-  public static String getQuery() {
-    return query;
-  }
+    public String getPageId() {
+        return pageId;
+    }
+
+    public String getPageNumber() {
+        return pageNumber;
+    }
+
+    public String getSnippet() {
+        return snippet;
+    }
+
+    public boolean getValidSnippet() {
+        return validSnippet;
+    }
 }

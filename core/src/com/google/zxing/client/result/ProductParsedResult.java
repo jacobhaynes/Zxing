@@ -22,6 +22,7 @@ package com.google.zxing.client.result;
 public final class ProductParsedResult extends ParsedResult {
 
     private final String productID;
+
     private final String normalizedProductID;
 
     ProductParsedResult(String productID) {
@@ -34,7 +35,8 @@ public final class ProductParsedResult extends ParsedResult {
         this.normalizedProductID = normalizedProductID;
     }
 
-    public String getProductID() {
+    @Override
+    public String getDisplayResult() {
         return productID;
     }
 
@@ -42,8 +44,7 @@ public final class ProductParsedResult extends ParsedResult {
         return normalizedProductID;
     }
 
-    @Override
-    public String getDisplayResult() {
+    public String getProductID() {
         return productID;
     }
 

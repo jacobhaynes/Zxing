@@ -35,6 +35,7 @@ import com.google.zxing.common.BitArray;
 final class AI01392xDecoder extends AI01decoder {
 
     private static final int headerSize = 5 + 1 + 2;
+
     private static final int lastDigitSize = 2;
 
     AI01392xDecoder(BitArray information) {
@@ -51,14 +52,14 @@ final class AI01392xDecoder extends AI01decoder {
 
         encodeCompressedGtin(buf, headerSize);
 
-        int lastAIdigit =
-                this.generalDecoder.extractNumericValueFromBitArray(headerSize + gtinSize, lastDigitSize);
+        int lastAIdigit = this.generalDecoder.extractNumericValueFromBitArray(
+                headerSize + gtinSize, lastDigitSize);
         buf.append("(392");
         buf.append(lastAIdigit);
         buf.append(')');
 
-        DecodedInformation decodedInformation =
-                this.generalDecoder.decodeGeneralPurposeField(headerSize + gtinSize + lastDigitSize, null);
+        DecodedInformation decodedInformation = this.generalDecoder.decodeGeneralPurposeField(
+                headerSize + gtinSize + lastDigitSize, null);
         buf.append(decodedInformation.getNewString());
 
         return buf.toString();

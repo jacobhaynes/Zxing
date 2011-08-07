@@ -19,20 +19,20 @@ package com.google.zxing.common;
 import java.util.Vector;
 
 /**
- * <p>This is basically a substitute for <code>java.util.Collections</code>, which is not
- * present in MIDP 2.0 / CLDC 1.1.</p>
- *
+ * <p>
+ * This is basically a substitute for <code>java.util.Collections</code>, which
+ * is not present in MIDP 2.0 / CLDC 1.1.
+ * </p>
+ * 
  * @author Sean Owen
  */
 public final class Collections {
 
-    private Collections() {
-    }
-
     /**
-     * Sorts its argument (destructively) using insert sort; in the context of this package
-     * insertion sort is simple and efficient given its relatively small inputs.
-     *
+     * Sorts its argument (destructively) using insert sort; in the context of
+     * this package insertion sort is simple and efficient given its relatively
+     * small inputs.
+     * 
      * @param vector vector to sort
      * @param comparator comparator to define sort ordering
      */
@@ -48,6 +48,9 @@ public final class Collections {
             }
             vector.setElementAt(value, j + 1);
         }
+    }
+
+    private Collections() {
     }
 
 }

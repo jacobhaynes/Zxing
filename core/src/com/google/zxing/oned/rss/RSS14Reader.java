@@ -16,6 +16,10 @@
 
 package com.google.zxing.oned.rss;
 
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Vector;
+
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.DecodeHintType;
 import com.google.zxing.NotFoundException;
@@ -24,67 +28,57 @@ import com.google.zxing.ResultPoint;
 import com.google.zxing.ResultPointCallback;
 import com.google.zxing.common.BitArray;
 
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Vector;
-
 /**
- * Decodes RSS-14, including truncated and stacked variants. See ISO/IEC 24724:2006.
+ * Decodes RSS-14, including truncated and stacked variants. See ISO/IEC
+ * 24724:2006.
  */
 public final class RSS14Reader extends AbstractRSSReader {
 
-    private static final int[] OUTSIDE_EVEN_TOTAL_SUBSET = {1,10,34,70,126};
-    private static final int[] INSIDE_ODD_TOTAL_SUBSET = {4,20,48,81};
-    private static final int[] OUTSIDE_GSUM = {0,161,961,2015,2715};
-    private static final int[] INSIDE_GSUM = {0,336,1036,1516};
-    private static final int[] OUTSIDE_ODD_WIDEST = {8,6,4,3,1};
-    private static final int[] INSIDE_ODD_WIDEST = {2,4,6,8};
-
-    private static final int[][] FINDER_PATTERNS = {
-        {3,8,2,1},
-        {3,5,5,1},
-        {3,3,7,1},
-        {3,1,9,1},
-        {2,7,4,1},
-        {2,5,6,1},
-        {2,3,8,1},
-        {1,5,7,1},
-        {1,3,9,1},
+    private static final int[] OUTSIDE_EVEN_TOTAL_SUBSET = {
+            1, 10, 34, 70, 126
     };
 
-    private final Vector<Pair> possibleLeftPairs;
-    private final Vector<Pair> possibleRightPairs;
+    private static final int[] INSIDE_ODD_TOTAL_SUBSET = {
+            4, 20, 48, 81
+    };
 
-    public RSS14Reader() {
-        possibleLeftPairs = new Vector<Pair>();
-        possibleRightPairs = new Vector<Pair>();
-    }
+    private static final int[] OUTSIDE_GSUM = {
+            0, 161, 961, 2015, 2715
+    };
 
-    @Override
-    public Result decodeRow(int rowNumber, BitArray row, Hashtable<?, ?> hints) throws NotFoundException {
-        Pair leftPair = decodePair(row, false, rowNumber, hints);
-        addOrTally(possibleLeftPairs, leftPair);
-        row.reverse();
-        Pair rightPair = decodePair(row, true, rowNumber, hints);
-        addOrTally(possibleRightPairs, rightPair);
-        row.reverse();
-        int numLeftPairs = possibleLeftPairs.size();
-        int numRightPairs = possibleRightPairs.size();
-        for (int l = 0; l < numLeftPairs; l++) {
-            Pair left = possibleLeftPairs.elementAt(l);
-            if (left.getCount() > 1) {
-                for (int r = 0; r < numRightPairs; r++) {
-                    Pair right = possibleRightPairs.elementAt(r);
-                    if (right.getCount() > 1) {
-                        if (checkChecksum(left, right)) {
-                            return constructResult(left, right);
-                        }
-                    }
-                }
-            }
-        }
-        throw NotFoundException.getNotFoundInstance();
-    }
+    private static final int[] INSIDE_GSUM = {
+            0, 336, 1036, 1516
+    };
+
+    private static final int[] OUTSIDE_ODD_WIDEST = {
+            8, 6, 4, 3, 1
+    };
+
+    private static final int[] INSIDE_ODD_WIDEST = {
+            2, 4, 6, 8
+    };
+
+    private static final int[][] FINDER_PATTERNS = {
+            {
+                    3, 8, 2, 1
+            }, {
+                    3, 5, 5, 1
+            }, {
+                    3, 3, 7, 1
+            }, {
+                    3, 1, 9, 1
+            }, {
+                    2, 7, 4, 1
+            }, {
+                    2, 5, 6, 1
+            }, {
+                    2, 3, 8, 1
+            }, {
+                    1, 5, 7, 1
+            }, {
+                    1, 3, 9, 1
+            },
+    };
 
     private static void addOrTally(Vector<Pair> possiblePairs, Pair pair) {
         if (pair == null) {
@@ -105,10 +99,21 @@ public final class RSS14Reader extends AbstractRSSReader {
         }
     }
 
-    @Override
-    public void reset() {
-        possibleLeftPairs.setSize(0);
-        possibleRightPairs.setSize(0);
+    private static boolean checkChecksum(Pair leftPair, Pair rightPair) {
+        int leftFPValue = leftPair.getFinderPattern().getValue();
+        int rightFPValue = rightPair.getFinderPattern().getValue();
+        if ((leftFPValue == 0 && rightFPValue == 8) || (leftFPValue == 8 && rightFPValue == 0)) {
+        }
+        int checkValue = (leftPair.getChecksumPortion() + 16 * rightPair.getChecksumPortion()) % 79;
+        int targetCheckValue = 9 * leftPair.getFinderPattern().getValue()
+                + rightPair.getFinderPattern().getValue();
+        if (targetCheckValue > 72) {
+            targetCheckValue--;
+        }
+        if (targetCheckValue > 8) {
+            targetCheckValue--;
+        }
+        return checkValue == targetCheckValue;
     }
 
     private static Result constructResult(Pair leftPair, Pair rightPair) {
@@ -134,247 +139,19 @@ public final class RSS14Reader extends AbstractRSSReader {
 
         ResultPoint[] leftPoints = leftPair.getFinderPattern().getResultPoints();
         ResultPoint[] rightPoints = rightPair.getFinderPattern().getResultPoints();
-        return new Result(
-                String.valueOf(buffer.toString()),
-                null,
-                new ResultPoint[] { leftPoints[0], leftPoints[1], rightPoints[0], rightPoints[1], },
-                BarcodeFormat.RSS_14);
+        return new Result(String.valueOf(buffer.toString()), null, new ResultPoint[] {
+                leftPoints[0], leftPoints[1], rightPoints[0], rightPoints[1],
+        }, BarcodeFormat.RSS_14);
     }
 
-    private static boolean checkChecksum(Pair leftPair, Pair rightPair) {
-        int leftFPValue = leftPair.getFinderPattern().getValue();
-        int rightFPValue = rightPair.getFinderPattern().getValue();
-        if ((leftFPValue == 0 && rightFPValue == 8) ||
-                (leftFPValue == 8 && rightFPValue == 0)) {
-        }
-        int checkValue = (leftPair.getChecksumPortion() + 16 * rightPair.getChecksumPortion()) % 79;
-        int targetCheckValue =
-                9 * leftPair.getFinderPattern().getValue() + rightPair.getFinderPattern().getValue();
-        if (targetCheckValue > 72) {
-            targetCheckValue--;
-        }
-        if (targetCheckValue > 8) {
-            targetCheckValue--;
-        }
-        return checkValue == targetCheckValue;
+    private final Vector<Pair> possibleLeftPairs;
+
+    private final Vector<Pair> possibleRightPairs;
+
+    public RSS14Reader() {
+        possibleLeftPairs = new Vector<Pair>();
+        possibleRightPairs = new Vector<Pair>();
     }
-
-    private Pair decodePair(BitArray row, boolean right, int rowNumber, Hashtable<?, ?> hints) {
-        try {
-            int[] startEnd = findFinderPattern(row, 0, right);
-            FinderPattern pattern = parseFoundFinderPattern(row, rowNumber, right, startEnd);
-
-            ResultPointCallback resultPointCallback = hints == null ? null :
-                (ResultPointCallback) hints.get(DecodeHintType.NEED_RESULT_POINT_CALLBACK);
-
-            if (resultPointCallback != null) {
-                float center = (startEnd[0] + startEnd[1]) / 2.0f;
-                if (right) {
-                    // row is actually reversed
-                    center = row.getSize() - 1 - center;
-                }
-                resultPointCallback.foundPossibleResultPoint(new ResultPoint(center, rowNumber));
-            }
-
-            DataCharacter outside = decodeDataCharacter(row, pattern, true);
-            DataCharacter inside = decodeDataCharacter(row, pattern, false);
-            return new Pair(1597 * outside.getValue() + inside.getValue(),
-                    outside.getChecksumPortion() + 4 * inside.getChecksumPortion(),
-                    pattern);
-        } catch (NotFoundException re) {
-            return null;
-        }
-    }
-
-    private DataCharacter decodeDataCharacter(BitArray row, FinderPattern pattern, boolean outsideChar)
-            throws NotFoundException {
-
-        int[] counters = dataCharacterCounters;
-        counters[0] = 0;
-        counters[1] = 0;
-        counters[2] = 0;
-        counters[3] = 0;
-        counters[4] = 0;
-        counters[5] = 0;
-        counters[6] = 0;
-        counters[7] = 0;
-
-        if (outsideChar) {
-            recordPatternInReverse(row, pattern.getStartEnd()[0], counters);
-        } else {
-            recordPattern(row, pattern.getStartEnd()[1] + 1, counters);
-            // reverse it
-            for (int i = 0, j = counters.length - 1; i < j; i++, j--) {
-                int temp = counters[i];
-                counters[i] = counters[j];
-                counters[j] = temp;
-            }
-        }
-
-        int numModules = outsideChar ? 16 : 15;
-        float elementWidth = (float) count(counters) / (float) numModules;
-
-        int[] oddCounts = this.oddCounts;
-        int[] evenCounts = this.evenCounts;
-        float[] oddRoundingErrors = this.oddRoundingErrors;
-        float[] evenRoundingErrors = this.evenRoundingErrors;
-
-        for (int i = 0; i < counters.length; i++) {
-            float value = counters[i] / elementWidth;
-            int count = (int) (value + 0.5f); // Round
-            if (count < 1) {
-                count = 1;
-            } else if (count > 8) {
-                count = 8;
-            }
-            int offset = i >> 1;
-        if ((i & 0x01) == 0) {
-            oddCounts[offset] = count;
-            oddRoundingErrors[offset] = value - count;
-        } else {
-            evenCounts[offset] = count;
-            evenRoundingErrors[offset] = value - count;
-        }
-        }
-
-        adjustOddEvenCounts(outsideChar, numModules);
-
-        int oddSum = 0;
-        int oddChecksumPortion = 0;
-        for (int i = oddCounts.length - 1; i >= 0; i--) {
-            oddChecksumPortion *= 9;
-            oddChecksumPortion += oddCounts[i];
-            oddSum += oddCounts[i];
-        }
-        int evenChecksumPortion = 0;
-        int evenSum = 0;
-        for (int i = evenCounts.length - 1; i >= 0; i--) {
-            evenChecksumPortion *= 9;
-            evenChecksumPortion += evenCounts[i];
-            evenSum += evenCounts[i];
-        }
-        int checksumPortion = oddChecksumPortion + 3*evenChecksumPortion;
-
-        if (outsideChar) {
-            if ((oddSum & 0x01) != 0 || oddSum > 12 || oddSum < 4) {
-                throw NotFoundException.getNotFoundInstance();
-            }
-            int group = (12 - oddSum) / 2;
-            int oddWidest = OUTSIDE_ODD_WIDEST[group];
-            int evenWidest = 9 - oddWidest;
-            int vOdd = RSSUtils.getRSSvalue(oddCounts, oddWidest, false);
-            int vEven = RSSUtils.getRSSvalue(evenCounts, evenWidest, true);
-            int tEven = OUTSIDE_EVEN_TOTAL_SUBSET[group];
-            int gSum = OUTSIDE_GSUM[group];
-            return new DataCharacter(vOdd * tEven + vEven + gSum, checksumPortion);
-        } else {
-            if ((evenSum & 0x01) != 0 || evenSum > 10 || evenSum < 4) {
-                throw NotFoundException.getNotFoundInstance();
-            }
-            int group = (10 - evenSum) / 2;
-            int oddWidest = INSIDE_ODD_WIDEST[group];
-            int evenWidest = 9 - oddWidest;
-            int vOdd = RSSUtils.getRSSvalue(oddCounts, oddWidest, true);
-            int vEven = RSSUtils.getRSSvalue(evenCounts, evenWidest, false);
-            int tOdd = INSIDE_ODD_TOTAL_SUBSET[group];
-            int gSum = INSIDE_GSUM[group];
-            return new DataCharacter(vEven * tOdd + vOdd + gSum, checksumPortion);
-        }
-
-    }
-
-    private int[] findFinderPattern(BitArray row, int rowOffset, boolean rightFinderPattern)
-            throws NotFoundException {
-
-        int[] counters = decodeFinderCounters;
-        counters[0] = 0;
-        counters[1] = 0;
-        counters[2] = 0;
-        counters[3] = 0;
-
-        int width = row.getSize();
-        boolean isWhite = false;
-        while (rowOffset < width) {
-            isWhite = !row.get(rowOffset);
-            if (rightFinderPattern == isWhite) {
-                // Will encounter white first when searching for right finder pattern
-                break;
-            }
-            rowOffset++;
-        }
-
-        int counterPosition = 0;
-        int patternStart = rowOffset;
-        for (int x = rowOffset; x < width; x++) {
-            boolean pixel = row.get(x);
-            if (pixel ^ isWhite) {
-                counters[counterPosition]++;
-            } else {
-                if (counterPosition == 3) {
-                    if (isFinderPattern(counters)) {
-                        return new int[]{patternStart, x};
-                    }
-                    patternStart += counters[0] + counters[1];
-                    counters[0] = counters[2];
-                    counters[1] = counters[3];
-                    counters[2] = 0;
-                    counters[3] = 0;
-                    counterPosition--;
-                } else {
-                    counterPosition++;
-                }
-                counters[counterPosition] = 1;
-                isWhite = !isWhite;
-            }
-        }
-        throw NotFoundException.getNotFoundInstance();
-
-    }
-
-    private FinderPattern parseFoundFinderPattern(BitArray row, int rowNumber, boolean right, int[] startEnd)
-            throws NotFoundException {
-        // Actually we found elements 2-5
-        boolean firstIsBlack = row.get(startEnd[0]);
-        int firstElementStart = startEnd[0] - 1;
-        // Locate element 1
-        while (firstElementStart >= 0 && firstIsBlack ^ row.get(firstElementStart)) {
-            firstElementStart--;
-        }
-        firstElementStart++;
-        int firstCounter = startEnd[0] - firstElementStart;
-        // Make 'counters' hold 1-4
-        int[] counters = decodeFinderCounters;
-        for (int i = counters.length - 1; i > 0; i--) {
-            counters[i] = counters[i-1];
-        }
-        counters[0] = firstCounter;
-        int value = parseFinderValue(counters, FINDER_PATTERNS);
-        int start = firstElementStart;
-        int end = startEnd[1];
-        if (right) {
-            // row is actually reversed
-            start = row.getSize() - 1 - start;
-            end = row.getSize() - 1 - end;
-        }
-        return new FinderPattern(value, new int[] {firstElementStart, startEnd[1]}, start, end, rowNumber);
-    }
-
-    /*
-  private static int[] normalizeE2SEValues(int[] counters) {
-    int p = 0;
-    for (int i = 0; i < counters.length; i++) {
-      p += counters[i];
-    }
-    int[] normalized = new int[counters.length - 2];
-    for (int i = 0; i < normalized.length; i++) {
-      int e = counters[i] + counters[i+1];
-      float eRatio = (float) e / (float) p;
-      float E = ((eRatio * 32.0f) + 1.0f) / 2.0f;
-      normalized[i] = (int) E;
-    }
-    return normalized;
-  }
-     */
 
     private void adjustOddEvenCounts(boolean outsideChar, int numModules) throws NotFoundException {
 
@@ -413,84 +190,324 @@ public final class RSS14Reader extends AbstractRSSReader {
             }
         }
 
-        /*if (mismatch == 2) {
-      if (!(oddParityBad && evenParityBad)) {
-        throw ReaderException.getInstance();
-      }
-      decrementOdd = true;
-      decrementEven = true;
-    } else if (mismatch == -2) {
-      if (!(oddParityBad && evenParityBad)) {
-        throw ReaderException.getInstance();
-      }
-      incrementOdd = true;
-      incrementEven = true;
-    } else */if (mismatch == 1) {
-        if (oddParityBad) {
-            if (evenParityBad) {
-                throw NotFoundException.getNotFoundInstance();
-            }
-            decrementOdd = true;
-        } else {
-            if (!evenParityBad) {
-                throw NotFoundException.getNotFoundInstance();
-            }
-            decrementEven = true;
-        }
-    } else if (mismatch == -1) {
-        if (oddParityBad) {
-            if (evenParityBad) {
-                throw NotFoundException.getNotFoundInstance();
-            }
-            incrementOdd = true;
-        } else {
-            if (!evenParityBad) {
-                throw NotFoundException.getNotFoundInstance();
-            }
-            incrementEven = true;
-        }
-    } else if (mismatch == 0) {
-        if (oddParityBad) {
-            if (!evenParityBad) {
-                throw NotFoundException.getNotFoundInstance();
-            }
-            // Both bad
-            if (oddSum < evenSum) {
-                incrementOdd = true;
-                decrementEven = true;
-            } else {
+        /*
+         * if (mismatch == 2) { if (!(oddParityBad && evenParityBad)) { throw
+         * ReaderException.getInstance(); } decrementOdd = true; decrementEven =
+         * true; } else if (mismatch == -2) { if (!(oddParityBad &&
+         * evenParityBad)) { throw ReaderException.getInstance(); } incrementOdd
+         * = true; incrementEven = true; } else
+         */if (mismatch == 1) {
+            if (oddParityBad) {
+                if (evenParityBad) {
+                    throw NotFoundException.getNotFoundInstance();
+                }
                 decrementOdd = true;
+            } else {
+                if (!evenParityBad) {
+                    throw NotFoundException.getNotFoundInstance();
+                }
+                decrementEven = true;
+            }
+        } else if (mismatch == -1) {
+            if (oddParityBad) {
+                if (evenParityBad) {
+                    throw NotFoundException.getNotFoundInstance();
+                }
+                incrementOdd = true;
+            } else {
+                if (!evenParityBad) {
+                    throw NotFoundException.getNotFoundInstance();
+                }
                 incrementEven = true;
             }
+        } else if (mismatch == 0) {
+            if (oddParityBad) {
+                if (!evenParityBad) {
+                    throw NotFoundException.getNotFoundInstance();
+                }
+                // Both bad
+                if (oddSum < evenSum) {
+                    incrementOdd = true;
+                    decrementEven = true;
+                } else {
+                    decrementOdd = true;
+                    incrementEven = true;
+                }
+            } else {
+                if (evenParityBad) {
+                    throw NotFoundException.getNotFoundInstance();
+                }
+                // Nothing to do!
+            }
         } else {
-            if (evenParityBad) {
+            throw NotFoundException.getNotFoundInstance();
+        }
+
+        if (incrementOdd) {
+            if (decrementOdd) {
                 throw NotFoundException.getNotFoundInstance();
             }
-            // Nothing to do!
+            increment(oddCounts, oddRoundingErrors);
         }
-    } else {
+        if (decrementOdd) {
+            decrement(oddCounts, oddRoundingErrors);
+        }
+        if (incrementEven) {
+            if (decrementEven) {
+                throw NotFoundException.getNotFoundInstance();
+            }
+            increment(evenCounts, oddRoundingErrors);
+        }
+        if (decrementEven) {
+            decrement(evenCounts, evenRoundingErrors);
+        }
+
+    }
+
+    private DataCharacter decodeDataCharacter(BitArray row, FinderPattern pattern,
+            boolean outsideChar) throws NotFoundException {
+
+        int[] counters = dataCharacterCounters;
+        counters[0] = 0;
+        counters[1] = 0;
+        counters[2] = 0;
+        counters[3] = 0;
+        counters[4] = 0;
+        counters[5] = 0;
+        counters[6] = 0;
+        counters[7] = 0;
+
+        if (outsideChar) {
+            recordPatternInReverse(row, pattern.getStartEnd()[0], counters);
+        } else {
+            recordPattern(row, pattern.getStartEnd()[1] + 1, counters);
+            // reverse it
+            for (int i = 0, j = counters.length - 1; i < j; i++, j--) {
+                int temp = counters[i];
+                counters[i] = counters[j];
+                counters[j] = temp;
+            }
+        }
+
+        int numModules = outsideChar ? 16 : 15;
+        float elementWidth = (float)count(counters) / (float)numModules;
+
+        int[] oddCounts = this.oddCounts;
+        int[] evenCounts = this.evenCounts;
+        float[] oddRoundingErrors = this.oddRoundingErrors;
+        float[] evenRoundingErrors = this.evenRoundingErrors;
+
+        for (int i = 0; i < counters.length; i++) {
+            float value = counters[i] / elementWidth;
+            int count = (int)(value + 0.5f); // Round
+            if (count < 1) {
+                count = 1;
+            } else if (count > 8) {
+                count = 8;
+            }
+            int offset = i >> 1;
+            if ((i & 0x01) == 0) {
+                oddCounts[offset] = count;
+                oddRoundingErrors[offset] = value - count;
+            } else {
+                evenCounts[offset] = count;
+                evenRoundingErrors[offset] = value - count;
+            }
+        }
+
+        adjustOddEvenCounts(outsideChar, numModules);
+
+        int oddSum = 0;
+        int oddChecksumPortion = 0;
+        for (int i = oddCounts.length - 1; i >= 0; i--) {
+            oddChecksumPortion *= 9;
+            oddChecksumPortion += oddCounts[i];
+            oddSum += oddCounts[i];
+        }
+        int evenChecksumPortion = 0;
+        int evenSum = 0;
+        for (int i = evenCounts.length - 1; i >= 0; i--) {
+            evenChecksumPortion *= 9;
+            evenChecksumPortion += evenCounts[i];
+            evenSum += evenCounts[i];
+        }
+        int checksumPortion = oddChecksumPortion + 3 * evenChecksumPortion;
+
+        if (outsideChar) {
+            if ((oddSum & 0x01) != 0 || oddSum > 12 || oddSum < 4) {
+                throw NotFoundException.getNotFoundInstance();
+            }
+            int group = (12 - oddSum) / 2;
+            int oddWidest = OUTSIDE_ODD_WIDEST[group];
+            int evenWidest = 9 - oddWidest;
+            int vOdd = RSSUtils.getRSSvalue(oddCounts, oddWidest, false);
+            int vEven = RSSUtils.getRSSvalue(evenCounts, evenWidest, true);
+            int tEven = OUTSIDE_EVEN_TOTAL_SUBSET[group];
+            int gSum = OUTSIDE_GSUM[group];
+            return new DataCharacter(vOdd * tEven + vEven + gSum, checksumPortion);
+        } else {
+            if ((evenSum & 0x01) != 0 || evenSum > 10 || evenSum < 4) {
+                throw NotFoundException.getNotFoundInstance();
+            }
+            int group = (10 - evenSum) / 2;
+            int oddWidest = INSIDE_ODD_WIDEST[group];
+            int evenWidest = 9 - oddWidest;
+            int vOdd = RSSUtils.getRSSvalue(oddCounts, oddWidest, true);
+            int vEven = RSSUtils.getRSSvalue(evenCounts, evenWidest, false);
+            int tOdd = INSIDE_ODD_TOTAL_SUBSET[group];
+            int gSum = INSIDE_GSUM[group];
+            return new DataCharacter(vEven * tOdd + vOdd + gSum, checksumPortion);
+        }
+
+    }
+
+    private Pair decodePair(BitArray row, boolean right, int rowNumber, Hashtable<?, ?> hints) {
+        try {
+            int[] startEnd = findFinderPattern(row, 0, right);
+            FinderPattern pattern = parseFoundFinderPattern(row, rowNumber, right, startEnd);
+
+            ResultPointCallback resultPointCallback = hints == null ? null
+                    : (ResultPointCallback)hints.get(DecodeHintType.NEED_RESULT_POINT_CALLBACK);
+
+            if (resultPointCallback != null) {
+                float center = (startEnd[0] + startEnd[1]) / 2.0f;
+                if (right) {
+                    // row is actually reversed
+                    center = row.getSize() - 1 - center;
+                }
+                resultPointCallback.foundPossibleResultPoint(new ResultPoint(center, rowNumber));
+            }
+
+            DataCharacter outside = decodeDataCharacter(row, pattern, true);
+            DataCharacter inside = decodeDataCharacter(row, pattern, false);
+            return new Pair(1597 * outside.getValue() + inside.getValue(),
+                    outside.getChecksumPortion() + 4 * inside.getChecksumPortion(), pattern);
+        } catch (NotFoundException re) {
+            return null;
+        }
+    }
+
+    @Override
+    public Result decodeRow(int rowNumber, BitArray row, Hashtable<?, ?> hints)
+            throws NotFoundException {
+        Pair leftPair = decodePair(row, false, rowNumber, hints);
+        addOrTally(possibleLeftPairs, leftPair);
+        row.reverse();
+        Pair rightPair = decodePair(row, true, rowNumber, hints);
+        addOrTally(possibleRightPairs, rightPair);
+        row.reverse();
+        int numLeftPairs = possibleLeftPairs.size();
+        int numRightPairs = possibleRightPairs.size();
+        for (int l = 0; l < numLeftPairs; l++) {
+            Pair left = possibleLeftPairs.elementAt(l);
+            if (left.getCount() > 1) {
+                for (int r = 0; r < numRightPairs; r++) {
+                    Pair right = possibleRightPairs.elementAt(r);
+                    if (right.getCount() > 1) {
+                        if (checkChecksum(left, right)) {
+                            return constructResult(left, right);
+                        }
+                    }
+                }
+            }
+        }
         throw NotFoundException.getNotFoundInstance();
     }
 
-    if (incrementOdd) {
-        if (decrementOdd) {
-            throw NotFoundException.getNotFoundInstance();
+    private int[] findFinderPattern(BitArray row, int rowOffset, boolean rightFinderPattern)
+            throws NotFoundException {
+
+        int[] counters = decodeFinderCounters;
+        counters[0] = 0;
+        counters[1] = 0;
+        counters[2] = 0;
+        counters[3] = 0;
+
+        int width = row.getSize();
+        boolean isWhite = false;
+        while (rowOffset < width) {
+            isWhite = !row.get(rowOffset);
+            if (rightFinderPattern == isWhite) {
+                // Will encounter white first when searching for right finder
+                // pattern
+                break;
+            }
+            rowOffset++;
         }
-        increment(oddCounts, oddRoundingErrors);
-    }
-    if (decrementOdd) {
-        decrement(oddCounts, oddRoundingErrors);
-    }
-    if (incrementEven) {
-        if (decrementEven) {
-            throw NotFoundException.getNotFoundInstance();
+
+        int counterPosition = 0;
+        int patternStart = rowOffset;
+        for (int x = rowOffset; x < width; x++) {
+            boolean pixel = row.get(x);
+            if (pixel ^ isWhite) {
+                counters[counterPosition]++;
+            } else {
+                if (counterPosition == 3) {
+                    if (isFinderPattern(counters)) {
+                        return new int[] {
+                                patternStart, x
+                        };
+                    }
+                    patternStart += counters[0] + counters[1];
+                    counters[0] = counters[2];
+                    counters[1] = counters[3];
+                    counters[2] = 0;
+                    counters[3] = 0;
+                    counterPosition--;
+                } else {
+                    counterPosition++;
+                }
+                counters[counterPosition] = 1;
+                isWhite = !isWhite;
+            }
         }
-        increment(evenCounts, oddRoundingErrors);
-    }
-    if (decrementEven) {
-        decrement(evenCounts, evenRoundingErrors);
+        throw NotFoundException.getNotFoundInstance();
+
     }
 
+    private FinderPattern parseFoundFinderPattern(BitArray row, int rowNumber, boolean right,
+            int[] startEnd) throws NotFoundException {
+        // Actually we found elements 2-5
+        boolean firstIsBlack = row.get(startEnd[0]);
+        int firstElementStart = startEnd[0] - 1;
+        // Locate element 1
+        while (firstElementStart >= 0 && firstIsBlack ^ row.get(firstElementStart)) {
+            firstElementStart--;
+        }
+        firstElementStart++;
+        int firstCounter = startEnd[0] - firstElementStart;
+        // Make 'counters' hold 1-4
+        int[] counters = decodeFinderCounters;
+        for (int i = counters.length - 1; i > 0; i--) {
+            counters[i] = counters[i - 1];
+        }
+        counters[0] = firstCounter;
+        int value = parseFinderValue(counters, FINDER_PATTERNS);
+        int start = firstElementStart;
+        int end = startEnd[1];
+        if (right) {
+            // row is actually reversed
+            start = row.getSize() - 1 - start;
+            end = row.getSize() - 1 - end;
+        }
+        return new FinderPattern(value, new int[] {
+                firstElementStart, startEnd[1]
+        }, start, end, rowNumber);
+    }
+
+    /*
+     * private static int[] normalizeE2SEValues(int[] counters) { int p = 0; for
+     * (int i = 0; i < counters.length; i++) { p += counters[i]; } int[]
+     * normalized = new int[counters.length - 2]; for (int i = 0; i <
+     * normalized.length; i++) { int e = counters[i] + counters[i+1]; float
+     * eRatio = (float) e / (float) p; float E = ((eRatio * 32.0f) + 1.0f) /
+     * 2.0f; normalized[i] = (int) E; } return normalized; }
+     */
+
+    @Override
+    public void reset() {
+        possibleLeftPairs.setSize(0);
+        possibleRightPairs.setSize(0);
     }
 
 }

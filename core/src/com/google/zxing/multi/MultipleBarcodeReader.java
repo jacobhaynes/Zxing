@@ -16,15 +16,16 @@
 
 package com.google.zxing.multi;
 
+import java.util.Hashtable;
+
 import com.google.zxing.BinaryBitmap;
 import com.google.zxing.NotFoundException;
 import com.google.zxing.Result;
 
-import java.util.Hashtable;
-
 /**
- * Implementation of this interface attempt to read several barcodes from one image.
- *
+ * Implementation of this interface attempt to read several barcodes from one
+ * image.
+ * 
  * @see com.google.zxing.Reader
  * @author Sean Owen
  */
