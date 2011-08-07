@@ -24,6 +24,7 @@ import com.google.zxing.client.android.R;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -34,9 +35,13 @@ import android.provider.Contacts;
 import android.text.ClipboardManager;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
+
 
 /**
  * Barcode Scanner can share data like contacts and bookmarks by displaying a QR Code on screen,
@@ -51,8 +56,7 @@ public final class ShareActivity extends Activity {
   private static final int PICK_BOOKMARK = 0;
   private static final int PICK_CONTACT = 1;
   private static final int PICK_APP = 2;
-
-  //private static final int METHODS_ID_COLUMN = 0;
+  
   private static final int METHODS_KIND_COLUMN = 1;
   private static final int METHODS_DATA_COLUMN = 2;
 
@@ -70,6 +74,10 @@ public final class ShareActivity extends Activity {
   };
 
   private Button clipboardButton;
+  
+  SharedPreferences settings; 
+  String barcodeFormat;
+
 
   private final Button.OnClickListener contactListener = new Button.OnClickListener() {
     @Override
@@ -130,7 +138,7 @@ public final class ShareActivity extends Activity {
     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
     intent.putExtra(Intents.Encode.TYPE, Contents.Type.TEXT);
     intent.putExtra(Intents.Encode.DATA, text);
-    intent.putExtra(Intents.Encode.FORMAT, BarcodeFormat.PDF_417.toString());
+    intent.putExtra(Intents.Encode.FORMAT, barcodeFormat);
     startActivity(intent);
   }
 
@@ -151,6 +159,9 @@ public final class ShareActivity extends Activity {
   protected void onResume() {
     super.onResume();
 
+    settings = getSharedPreferences("barcodeFormat",MODE_PRIVATE);
+    barcodeFormat = settings.getString("barcodeFormat", BarcodeFormat.QR_CODE.toString());
+    
     ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
     if (clipboard.hasText()) {
       clipboardButton.setEnabled(true);
@@ -186,7 +197,7 @@ public final class ShareActivity extends Activity {
     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
     intent.putExtra(Intents.Encode.TYPE, Contents.Type.TEXT);
     intent.putExtra(Intents.Encode.DATA, text);
-    intent.putExtra(Intents.Encode.FORMAT, BarcodeFormat.PDF_417.toString());
+    intent.putExtra(Intents.Encode.FORMAT, barcodeFormat);
     startActivity(intent);
   }
 
@@ -269,7 +280,7 @@ public final class ShareActivity extends Activity {
       intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
       intent.putExtra(Intents.Encode.TYPE, Contents.Type.CONTACT);
       intent.putExtra(Intents.Encode.DATA, bundle);
-      intent.putExtra(Intents.Encode.FORMAT, BarcodeFormat.QR_CODE.toString());
+      intent.putExtra(Intents.Encode.FORMAT, barcodeFormat);
 
       Log.i(TAG, "Sending bundle for encoding: " + bundle);
       startActivity(intent);
@@ -286,5 +297,43 @@ public final class ShareActivity extends Activity {
       data = data.replace("\r", " ");
     }
     return data;
+  }
+  
+  private static final int QR_CODE = Menu.FIRST;
+  private static final int PDF_417 = Menu.FIRST + 1;
+  
+  @Override
+  public boolean onPrepareOptionsMenu(Menu menu) {
+    super.onPrepareOptionsMenu(menu);
+    menu.clear();
+    if (barcodeFormat.equals(BarcodeFormat.PDF_417.toString())){
+    menu.add(0, QR_CODE, 0, "QR Code")
+        .setIcon(android.R.drawable.radiobutton_off_background);
+    menu.add(0, PDF_417, 0, "PDF417")
+        .setIcon(android.R.drawable.radiobutton_on_background);
+    } else {
+    menu.add(0, QR_CODE, 0, "QR Code")
+        .setIcon(android.R.drawable.radiobutton_on_background);
+    menu.add(0, PDF_417, 0, "PDF 417")
+        .setIcon(android.R.drawable.radiobutton_off_background);
+    }
+    return true;
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      case PDF_417: {
+        barcodeFormat = BarcodeFormat.PDF_417.toString();
+        settings.edit().putString("barcodeFormat", barcodeFormat).commit();
+        break;
+      }
+      case QR_CODE: {
+          barcodeFormat = BarcodeFormat.QR_CODE.toString();
+          settings.edit().putString("barcodeFormat", barcodeFormat).commit();
+        break;
+      }
+    }
+    return super.onOptionsItemSelected(item);
   }
 }

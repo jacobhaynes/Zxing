@@ -35,7 +35,7 @@ public class PDF417Ext {
 		eccLevel = new PDF417_eccLevel();
 		eccCW = new PDF417_eccCodewords();
 	}
-
+	
 	/** Gets a ByteArray of the PDF417 */
 	public void createArray() {
 		// Ensure the barcode was encoded
@@ -249,6 +249,11 @@ public class PDF417Ext {
 	public void setEccLevel(PDF417_eccLevel eccLevel) {
 		this.eccLevel = eccLevel;
 	}
+	
+	public void setEccLevelAutomatic(){
+	    this.eccLevel = new PDF417_eccLevel();
+	    this.eccLevel.setEccLevel(dataCW.data.length);
+	}
 
 	/** Changes the number or rows/columns of data the PDF417 has */
 	public void setSize(PDF417_size size) {
@@ -264,4 +269,21 @@ public class PDF417Ext {
 	public void setTruncated(boolean truncated) {
 		this.truncated = truncated;
 	}
+	
+    public byte[][] getFlippedArray() {
+        rotateArray();
+        return bitarray;
+    }
+    
+    private void rotateArray(){
+      byte[][] temp = new byte[bitarray[0].length][bitarray.length];
+      for(int ii = 0; ii < bitarray.length; ii++){
+          //This makes the direction consistent on screen when rotating the screen;
+          int inverseii = bitarray.length - ii -1;
+          for(int jj =0; jj < bitarray[0].length; jj++){
+              temp[jj][inverseii] = bitarray[ii][jj];
+          }
+      }
+      bitarray = temp;
+    }
 }

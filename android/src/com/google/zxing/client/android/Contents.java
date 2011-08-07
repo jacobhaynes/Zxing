@@ -18,7 +18,6 @@ package com.google.zxing.client.android;
 
 //import android.provider.Contacts;
 import android.provider.ContactsContract;
-import android.provider.ContactsContract.Contacts;
 
 /**
  * The set of constants to use when sending Barcode Scanner an Intent which requests a barcode

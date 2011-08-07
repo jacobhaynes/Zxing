@@ -26,6 +26,8 @@ import android.preference.PreferenceScreen;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import com.google.zxing.BarcodeFormat;
+
 /**
  * The main settings activity.
  *

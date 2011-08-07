@@ -24,6 +24,7 @@ import java.io.IOException;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -36,6 +37,7 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 import com.google.zxing.client.android.FinishListener;
 import com.google.zxing.client.android.Intents;
@@ -45,7 +47,8 @@ import com.google.zxing.client.android.R;
  * This class encodes data from an Intent into a QR code, and then displays it
  * full screen so that another person can scan it with their device.
  * 
- * @author dswitkin@google.com (Daniel Switkin)
+ * @author Jacob Haynes (jacob.haynes@colorado.edu, jacobhayens@google.com)
+ *  dswitkin@google.com (Daniel Switkin)
  */
 public final class EncodeActivity extends Activity {
 
@@ -53,9 +56,7 @@ public final class EncodeActivity extends Activity {
 
     private static final int MAX_BARCODE_FILENAME_LENGTH = 24;
 
-    private QRCodeEncoder qrCodeEncoder;
-
-    private PDF417Encoder pdf417Encoder;
+    private Encoder encoder;
 
     @Override
     public void onCreate(Bundle icicle) {
@@ -81,15 +82,15 @@ public final class EncodeActivity extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (pdf417Encoder == null) { // Odd
+        if (encoder == null) { // Odd
             Log.w(TAG, "No existing barcode to send?");
             return true;
         }
 
-        String contents = pdf417Encoder.getContents();
+        String contents = encoder.getContents();
         Bitmap bitmap;
         try {
-            bitmap = pdf417Encoder.encodeAsBitmap();
+            bitmap = encoder.encodeAsBitmap();
         } catch (WriterException we) {
             Log.w(TAG, we);
             return true;
@@ -124,8 +125,8 @@ public final class EncodeActivity extends Activity {
 
         Intent intent = new Intent(Intent.ACTION_SEND, Uri.parse("mailto:"));
         intent.putExtra(Intent.EXTRA_SUBJECT,
-                getString(R.string.app_name) + " - " + pdf417Encoder.getTitle());
-        intent.putExtra(Intent.EXTRA_TEXT, pdf417Encoder.getContents());
+                getString(R.string.app_name) + " - " + encoder.getTitle());
+        intent.putExtra(Intent.EXTRA_TEXT, encoder.getContents());
         intent.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + barcodeFile.getAbsolutePath()));
         intent.setType("image/png");
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
@@ -153,28 +154,43 @@ public final class EncodeActivity extends Activity {
         // This assumes the view is full screen, which is a good assumption
         WindowManager manager = (WindowManager)getSystemService(WINDOW_SERVICE);
         Display display = manager.getDefaultDisplay();
-        int width = display.getWidth();
-        int height = display.getHeight();
-        int smallerDimension = width < height ? width : height;
-        smallerDimension = smallerDimension * 7 / 8;
+        int width = display.getWidth() * 7/8;
+        int height = display.getHeight()* 7/8;
 
         Intent intent = getIntent();
         try {
-            pdf417Encoder = new PDF417Encoder(this, intent, smallerDimension);
-            setTitle(getString(R.string.app_name) + " - " + pdf417Encoder.getTitle());
-            Bitmap bitmap = pdf417Encoder.encodeAsBitmap();
+            
+            
+            SharedPreferences settings = getSharedPreferences("barcodeFormat",MODE_PRIVATE);
+          //If it is a QR_Code, make sure that it is a square (for purpose of showing text
+            if (BarcodeFormat.QR_CODE.toString()
+                    .equals(settings.getString("barcodeFormat", BarcodeFormat.QR_CODE.toString()))){
+                if (height > width) {
+                    height = width;
+                } else {
+                    width = height;
+                }
+            }
+            
+            encoder = new Encoder(this, intent, width, height);
+            setTitle(getString(R.string.app_name) + " - " + encoder.getTitle());
+            Bitmap bitmap = encoder.encodeAsBitmap();
             ImageView view = (ImageView)findViewById(R.id.image_view);
             view.setImageBitmap(bitmap);
-            //TextView contents = (TextView)findViewById(R.id.contents_text_view);
-            //contents.setText(pdf417Encoder.getDisplayContents());
+            
+            //text can mess up PDF417?
+            //if (!encoder.format.equals(BarcodeFormat.PDF_417)){
+              TextView contents = (TextView) findViewById(R.id.contents_text_view);
+              contents.setText(encoder.getDisplayContents());
+            //}
         } catch (WriterException e) {
             Log.e(TAG, "Could not encode barcode", e);
             showErrorMessage(R.string.msg_encode_contents_failed);
-            pdf417Encoder = null;
+            encoder = null;
         } catch (IllegalArgumentException e) {
             Log.e(TAG, "Could not encode barcode", e);
             showErrorMessage(R.string.msg_encode_contents_failed);
-            pdf417Encoder = null;
+            encoder = null;
         }
     }
 

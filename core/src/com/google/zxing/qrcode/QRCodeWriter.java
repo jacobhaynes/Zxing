@@ -23,7 +23,7 @@ import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.encoder.ByteMatrix;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
-import com.google.zxing.qrcode.encoder.Encoder;
+import com.google.zxing.qrcode.encoder.QRCodeEncoder;
 import com.google.zxing.qrcode.encoder.QRCode;
 
 import java.util.Hashtable;
@@ -70,7 +70,7 @@ public final class QRCodeWriter implements Writer {
         }
 
         QRCode code = new QRCode();
-        Encoder.encode(contents, errorCorrectionLevel, hints, code);
+        QRCodeEncoder.encode(contents, errorCorrectionLevel, hints, code);
         return renderResult(code, width, height);
     }
 

@@ -28,6 +28,10 @@ class PDF417_eccLevel {
 	public int getEccLevel() {
 		return eccLevel;
 	}
+	
+	public void setEccLevel(int dataCodeworks) {
+	    eccLevel = internalDetect(dataCodeworks);
+	}
 
 	private int internalDetect(int dataCodewords) {
 		// if auto detection is not needed - don't do it
